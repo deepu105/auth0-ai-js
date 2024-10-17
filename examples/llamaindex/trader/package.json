@@ -1,0 +1,13 @@
+{
+  "name": "trader",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "citty": "^0.1.6",
+    "dotenv": "^16.4.5",
+    "llamaindex": "^0.7.0"
+  }
+}
