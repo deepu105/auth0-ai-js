@@ -5,3 +5,7 @@ A lot of your questions might already exist in our [wiki page](http://bit.ly/Eng
 
 Please reach out to us over on [#eng-release](https://okta.slack.com/archives/C7L27G2Q5) or
 [#eng-productivity](https://okta.slack.com/archives/C7LQ4U8T0) for any additional assistance you might require.
+
+## License
+
+Apache-2.0
