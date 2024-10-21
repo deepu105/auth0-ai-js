@@ -1,6 +1,6 @@
 import { defineCommand, runMain } from 'citty';
 import { OpenAIAgent, FunctionTool } from "llamaindex";
-import { loop } from '../../../packages/ai-llamaindex'; // TODO: replace with '@auth0/ai-llamaindex'
+import { loop, reenterLoop } from '../../../packages/ai-llamaindex'; // TODO: replace with '@auth0/ai-llamaindex'
 import { buy } from './tools/buy';
 
 import 'dotenv/config'
@@ -29,17 +29,35 @@ const main = defineCommand({
     },
   },
   run({ args }) {
-    prompt(args.message);
+    const agent = new OpenAIAgent({
+      tools: [ buyTool ],
+      verbose: true
+    });
+    
+    
+    if (args.thread) {
+      resume(agent, args.thread, args.token);
+      return;
+    }
+    
+    prompt(agent, args.message);
   },
 });
 
 runMain(main);
 
-async function prompt(message) {
-  exec(message)
+async function prompt(agent, message) {
+  const response = await loop(agent, { message: message });
+  if (response) {
+    console.log(response.message);
+  }
 }
 
-async function resume(threadID, token) {
+async function resume(agent, threadID, token) {
+  const response = await reenterLoop(agent, threadID, { token: token });
+  if (response) {
+    console.log(response.message);
+  }
 }
 
 
@@ -64,14 +82,3 @@ const buyTool = FunctionTool.from(buy,
   },
 );
 
-async function exec(message) {
-  const agent = new OpenAIAgent({
-    tools: [ buyTool ],
-    verbose: true
-  });
-  
-  const response = await loop(agent, { message: message });
-  if (response) {
-    console.log(response.message);
-  }
-}
