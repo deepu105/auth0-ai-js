@@ -29,3 +29,12 @@ export function loop(agent, params, ctx) {
     }
   });
 }
+
+export async function reenterLoop(agent, threadID, ctx) {
+  var store = new FSStore('.');
+  var messages = await store.load(threadID);
+  
+  // FIXME: pass in chat history correctly
+  return loop(agent, { message: messages[0].content }, ctx)
+  //return loop(agent, { chatHistory: messages }, ctx)
+}
