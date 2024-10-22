@@ -1,6 +1,6 @@
 import { defineCommand, runMain } from 'citty';
 import { OpenAIAgent, FunctionTool } from "llamaindex";
-import { loop, reenterLoop } from '../../../packages/ai-llamaindex'; // TODO: replace with '@auth0/ai-llamaindex'
+import { loop, reenterLoop } from '@auth0/ai-llamaindex';
 import { buy } from './tools/buy';
 
 import 'dotenv/config'

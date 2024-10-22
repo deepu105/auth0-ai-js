@@ -1,5 +1,5 @@
-import { agentAsyncStorage } from '../../../../packages/ai'; // '@auth0/ai';
-import { AuthorizationError } from '../../../../packages/ai'; // '@auth0/ai';
+import { agentAsyncStorage } from '@auth0/ai';
+import { AuthorizationError } from '@auth0/ai';
 
 export let buy = function({ ticker, qty }) {
   console.log('BUY: ' + qty + ' ' + ticker);
