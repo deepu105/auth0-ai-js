@@ -1,0 +1,14 @@
+{
+  "name": "auth0-ai-js",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build"
+  },
+  "devDependencies": {
+    "turbo": "^2.2.3"
+  },
+  "packageManager": "npm@9.8.0",
+  "workspaces": [
+    "packages/*"
+  ]
+}
