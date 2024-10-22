@@ -1,4 +1,4 @@
-import { CIBAAuthorizer, FSStore, AuthorizationError, agentAsyncStorage } from '../../ai'; // '@auth0/ai';
+import { CIBAAuthorizer, FSStore, AuthorizationError, agentAsyncStorage } from '@auth0/ai';
 
 export function loop(agent, params, ctx) {
   return agentAsyncStorage.run(ctx || {}, async () => {
