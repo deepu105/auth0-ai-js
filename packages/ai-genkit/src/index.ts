@@ -13,13 +13,15 @@ export async function loop(generate, params, ctx) {
   console.log(params.tools)
   
   return agentAsyncStorage.run(ctx || {}, async () => {
+    let llmResponse;
+    
     try {
       // https://firebase.google.com/docs/genkit/tool-calling
       // manually handle tool calling, so that we can obtain history and save it as needed
       
       params.returnToolRequests = true;
       
-      let llmResponse;
+      //let llmResponse;
       while (true) {
         llmResponse = await generate(params);
         const toolRequests = llmResponse.toolRequests();
@@ -84,8 +86,8 @@ export async function loop(generate, params, ctx) {
       console.log('???')
       console.log(ex)
       console.log(ex.scope);
-      console.log(this);
-      console.log(params)
+      //console.log(this);
+      //console.log(params)
       
       if (ex instanceof AuthorizationError) {
         console.log('Authorization...');
@@ -94,6 +96,17 @@ export async function loop(generate, params, ctx) {
         var tid = await authorizer.authorize('stock.buy');
         
         console.log(tid);
+        var hist = llmResponse.toHistory();
+        console.log(hist);
+        console.log(hist[1])
+        
+        // Slice off the last message, under the assumption that it was a tool call that failed
+        // TODO: make this more robust by checking
+        var messages = hist.slice(0, -1);
+        
+        var store = new FSStore('.');
+        await store.store(tid, messages);
+        return;
       }
     }
   });
