@@ -4,8 +4,11 @@
   "description": "",
   "x-type": "module",
   "main": "index.js",
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "Auth0 Inc.",
+    "url": "https://auth0.com"
+  },
+  "license": "Apache-2.0",
   "dependencies": {
     "@auth0/ai": "*",
     "@auth0/ai-llamaindex": "*",

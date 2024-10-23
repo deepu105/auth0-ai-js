@@ -9,6 +9,7 @@
   },
   "packageManager": "npm@9.8.0",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "examples/llamaindex/trader"
   ]
 }
