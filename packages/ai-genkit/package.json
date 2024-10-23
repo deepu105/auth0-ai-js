@@ -1,0 +1,26 @@
+{
+  "name": "@auth0/ai-genkit",
+  "version": "0.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "author": {
+    "name": "Auth0 Inc.",
+    "url": "https://auth0.com"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@auth0/ai": "*"
+  },
+  "x-dependencies": {
+    "@genkit-ai/ai": "^0.5.16"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.3"
+  }
+}
