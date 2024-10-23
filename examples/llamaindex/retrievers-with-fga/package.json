@@ -1,7 +1,7 @@
 {
-  "name": "retrievers-with-fga",
+  "name": "llamaindex-retrievers-with-fga",
   "version": "0.0.0",
-  "description": "",
+  "description": "Demonstrates the usage of the OKTA FGA with a llamaindex to query documents with permission checks.",
   "x-type": "module",
   "main": "index.js",
   "author": {
