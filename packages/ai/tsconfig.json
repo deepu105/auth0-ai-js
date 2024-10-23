@@ -3,12 +3,14 @@
     "module": "commonjs",
     "target": "es2015",
     "declaration": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "skipLibCheck": true,
   },
   "include": [
     "src/**/*"
   ],
   "types":  [
     "@types/node"
-  ]
+  ],
+  "exclude": ["node_modules"]
 }
