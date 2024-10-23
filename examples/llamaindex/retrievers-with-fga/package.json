@@ -1,0 +1,20 @@
+{
+  "name": "retrievers-with-fga",
+  "version": "0.0.0",
+  "description": "",
+  "x-type": "module",
+  "main": "index.js",
+  "author": {
+    "name": "Auth0 Inc.",
+    "url": "https://auth0.com"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "dev": "npx tsx index.ts",
+    "fga:init": "npx tsx ./scripts/fga-init.ts"
+  },
+  "dependencies": {
+    "@auth0/ai-llamaindex": "*",
+    "@openfga/sdk": "^0.7.0"
+  }
+}
