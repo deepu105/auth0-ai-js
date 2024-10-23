@@ -4,6 +4,7 @@ import { generate, defineTool } from '@genkit-ai/ai';
 import { configureGenkit } from '@genkit-ai/core';
 import { openAI, gpt4o } from 'genkitx-openai';
 import * as z from 'zod';
+import { loop } from '@auth0/ai-genkit';
 import { buy } from './tools/buy';
 
 import 'dotenv/config'
@@ -30,6 +31,7 @@ const buyTool = defineTool(
 );
 
 
+/*
 const result = await generate({
   model: gpt4o,
   prompt: 'Buy 100 shares of ZEKO',
@@ -38,3 +40,16 @@ const result = await generate({
 
 console.log(result);
 console.log(result.text())
+*/
+
+const response = await loop(generate, {
+  model: gpt4o,
+  prompt: 'Buy 100 shares of ZEKO',
+  tools: [buyTool]
+});
+
+console.log('=== DONE ===');
+ 
+if (response) {
+  console.log(response.text())
+}

@@ -10,6 +10,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "@auth0/ai-genkit": "*",
     "@genkit-ai/ai": "^0.5.16",
     "@genkit-ai/core": "^0.5.16",
     "dotenv": "^16.4.5",
