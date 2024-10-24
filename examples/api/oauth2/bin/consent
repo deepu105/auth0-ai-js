@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+var argv = require('minimist')(process.argv.slice(2));
+var db = require('../db');
+console.log(argv);
+
+db.run('UPDATE authorization_requests SET is_approved = ? WHERE id = ?', [
+  1,
+  argv.t,
+], function(err) {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  console.log('Approved.');
+});
