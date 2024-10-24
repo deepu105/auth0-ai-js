@@ -1,5 +1,7 @@
 var express = require('express');
+var crypto = require('crypto');
 var router = express.Router();
+var db = require('../db');
 
 /* POST backchannel authentication request. */
 router.post('/bc-authorize', function(req, res, next) {
@@ -7,11 +9,23 @@ router.post('/bc-authorize', function(req, res, next) {
   console.log(req.headers);
   console.log(req.body)
   
-  res.json({
-    auth_req_id: 'tid-222-333',
-    expires_in: 120,
-    interval: 2,
-    foo: 'bar'
+  var uuid = crypto.randomUUID();
+  db.run('INSERT INTO authorization_requests (id, scope) VALUES (?, ?)', [
+    uuid,
+    req.body.scope,
+  ], function(err) {
+    if (err) { return next(err); }
+
+    console.log('==========');
+    console.log('Agent is requesting access to ' + req.body.scope + '.  Execute the following to allow access:\n   $ ./bin/consent -t ' + uuid);
+    console.log('==========');
+
+    var body = {
+      auth_req_id: uuid,
+      expires_in: 120,
+      interval: 2,
+    };
+    res.json(body);
   });
 });
 
