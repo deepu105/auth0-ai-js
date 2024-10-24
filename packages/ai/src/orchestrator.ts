@@ -24,7 +24,7 @@ export class Orchestrator {
         auth_req_id: transactionID
       }
       
-      const response = await fetch('http://localhost:3000/token', {
+      const response = await fetch('http://localhost:3000/oauth2/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -33,11 +33,17 @@ export class Orchestrator {
         // ...
       });
     
-      //var json = await response.json();
-      //console.log(json)
+      var json = await response.json();
+      console.log(json)
+      if (json.error == 'authorization_pending') { return; }
+      if (json.error == 'access_denied') {
+        clearInterval(handle);
+        return;
+      }
       
+      var token = json.access_token;
+      console.log('got token: ' + token);
       clearInterval(handle);
-      
     }, 1000)
     
     
