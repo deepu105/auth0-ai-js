@@ -5,6 +5,10 @@ import {
   FSStore,
 } from "@auth0/ai";
 
+export { LlamaIndexOrchestrator as Orchestrator } from './orchestrator'
+
+
+
 export function loop(agent, params, ctx) {
   return agentAsyncStorage.run(ctx || {}, async () => {
     try {
