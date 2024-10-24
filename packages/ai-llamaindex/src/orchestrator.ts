@@ -32,6 +32,7 @@ export class LlamaIndexOrchestrator extends Orchestrator {
           console.log('Waiting for approval: ' + transactionID);
 
           await this.historyStore.store(transactionID, messages);
+          this.watch(transactionID);
           return;
         }
         

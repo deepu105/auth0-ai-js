@@ -11,4 +11,35 @@ export class Orchestrator {
     console.log('prompting...');
     console.log(message)
   }
+  
+  watch(transactionID) {
+    // TODO: make this more generic, so it supports other CIBA bindings other than polling
+    console.log('watch: ' + transactionID);
+    
+    var handle = setInterval(async function() {
+      console.log('polling...');
+      
+      var body = {
+        grant_type: 'urn:openid:params:grant-type:ciba',
+        auth_req_id: transactionID
+      }
+      
+      const response = await fetch('http://localhost:3000/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(body),
+        // ...
+      });
+    
+      //var json = await response.json();
+      //console.log(json)
+      
+      clearInterval(handle);
+      
+    }, 1000)
+    
+    
+  }
 }
