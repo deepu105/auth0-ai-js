@@ -24,6 +24,8 @@ export async function loop(generate, params, ctx) {
       //let llmResponse;
       while (true) {
         llmResponse = await generate(params);
+        
+        
         const toolRequests = llmResponse.toolRequests();
         if (toolRequests.length < 1) {
           break;
@@ -110,4 +112,17 @@ export async function loop(generate, params, ctx) {
       }
     }
   });
+}
+
+
+export async function reenterLoop(generate, params, threadID, ctx) {
+  console.log('reenter loop...')
+  
+  var store = new FSStore(".");
+  var messages = await store.load(threadID);
+  console.log(messages);
+  
+  // FIXME: pass in chat history correctly
+  params.prompt = messages[0].content[0].text;
+  return loop(generate, params, ctx);
 }
