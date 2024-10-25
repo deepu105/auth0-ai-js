@@ -1,6 +1,7 @@
 import { defineCommand, runMain } from 'citty';
 import { OpenAIAgent, FunctionTool } from "llamaindex";
-import { loop, reenterLoop } from '@auth0/ai-llamaindex';
+import { CIBAAuthorizer, FSStore } from '@auth0/ai';
+import { Orchestrator, loop, reenterLoop } from '@auth0/ai-llamaindex';
 import { buy } from './tools/buy';
 
 import 'dotenv/config'
@@ -47,7 +48,14 @@ const main = defineCommand({
 runMain(main);
 
 async function prompt(agent, message) {
-  const response = await loop(agent, { message: message });
+  const app = new Orchestrator();
+  app.agent = agent;
+  app.authorizer = new CIBAAuthorizer("http://localhost:3000/oauth2/bc-authorize");
+  app.historyStore = new FSStore(".");
+  
+  
+  const response = await app.prompt(message);
+  //const response = await loop(agent, { message: message });
   if (response) {
     console.log(response.message);
   }

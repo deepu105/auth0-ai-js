@@ -16,6 +16,8 @@ export class Orchestrator {
     // TODO: make this more generic, so it supports other CIBA bindings other than polling
     console.log('watch: ' + transactionID);
     
+    var self = this;
+    
     var handle = setInterval(async function() {
       console.log('polling...');
       
@@ -44,8 +46,12 @@ export class Orchestrator {
       var token = json.access_token;
       console.log('got token: ' + token);
       clearInterval(handle);
+      self.resume(transactionID, token);
     }, 1000)
     
     
+  }
+  
+  async resume(transactionID, token) {
   }
 }

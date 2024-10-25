@@ -42,4 +42,16 @@ export class LlamaIndexOrchestrator extends Orchestrator {
     
     
   }
+  
+  async resume(transactionID, token) {
+    //console.log('llamaindex resume');
+    
+    var messages = await this.historyStore.load(transactionID);
+    // FIXME: pass in chat history correctly
+    this.agent.reset();
+    var response = await this.prompt(messages[0].content, { token: token })
+    if (response) {
+      console.log(response.message);
+    }
+  }
 }
