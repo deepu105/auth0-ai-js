@@ -135,6 +135,26 @@ export class GenkitOrchestrator extends Orchestrator {
     console.log(transactionID);
     console.log(token);
     
+    
+    var messages = await this.historyStore.load(transactionID);
+    
+    console.log(messages);
+    // FIXME: pass in chat history correctly
+    var text = messages[0].content[0].text;
+    console.log('REPROMPT');
+    console.log(text);
+    
+    var response = await this.promptEx(this.agent.generate, {
+      prompt: text,
+      tools: this.agent.tools,
+      model: this.agent.model
+    }, { token: token });
+    
+    if (response) {
+      console.log(response.text());
+    }
+    
+    
     /*
     var messages = await this.historyStore.load(transactionID);
     // FIXME: pass in chat history correctly
