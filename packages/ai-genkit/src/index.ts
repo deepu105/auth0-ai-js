@@ -2,6 +2,7 @@
 //import { generate } from '@genkit-ai/ai';
 import { CIBAAuthorizer, FSStore, AuthorizationError, agentAsyncStorage } from '@auth0/ai';
 
+export { GenkitAgent as Agent } from './agent'
 export { GenkitOrchestrator as Orchestrator } from './orchestrator'
 
 // references:

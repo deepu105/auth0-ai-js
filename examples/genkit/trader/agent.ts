@@ -5,6 +5,8 @@ import { generate, defineTool } from '@genkit-ai/ai';
 import { configureGenkit } from '@genkit-ai/core';
 import { openAI, gpt4o } from 'genkitx-openai';
 import * as z from 'zod';
+import { CIBAAuthorizer, FSStore } from '@auth0/ai';
+import { Orchestrator, Agent } from '@auth0/ai-genkit';
 import { loop, reenterLoop } from '@auth0/ai-genkit';
 import { buy } from './tools/buy';
 
@@ -91,6 +93,25 @@ async function resume(model, tools, threadID, token) {
 }
 
 async function prompt(model, tools, message) {
+  console.log('prompt.')
+  const app = new Orchestrator();
+  //app.agent = agent;
+  app.agent = new Agent(generate, model, tools)
+  app.authorizer = new CIBAAuthorizer("http://localhost:3000/oauth2/bc-authorize");
+  app.historyStore = new FSStore(".");
+  
+  //const response = await app.prompt(message);
+  const response = await app.promptEx(generate, {
+    model: model,
+    prompt: message,
+    tools: tools
+  });
+  if (response) {
+    console.log(response.message);
+  }
+  
+  return;
+  
   const result = await loop(generate, {
     model: model,
     prompt: message,
