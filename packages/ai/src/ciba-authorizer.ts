@@ -1,13 +1,13 @@
 export class CIBAAuthorizer {
   url
   
-  constructor(url) {
+  constructor(url: string) {
     this.url = url;
   }
   
-  async authorize(scope) {
+  async authorize(scope: string[]) {
     var body = {
-      scope: scope
+      scope: scope.join(' ')
     }
     // TODO: acr_values
     // TODO: id_token_hint

@@ -1,6 +1,9 @@
+
+import type { CIBAAuthorizer } from "./ciba-authorizer";
+
 export class Orchestrator {
   agent
-  authorizer
+  authorizer : CIBAAuthorizer
   historyStore
   
   constructor() {

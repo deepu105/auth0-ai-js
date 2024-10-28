@@ -3,7 +3,7 @@
 
 export class AuthorizationError extends Error {
   code
-  scope
+  scope: string[]
   acrValues
   maxAge
   realm
