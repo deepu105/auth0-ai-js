@@ -2,6 +2,8 @@
 //import { generate } from '@genkit-ai/ai';
 import { CIBAAuthorizer, FSStore, AuthorizationError, agentAsyncStorage } from '@auth0/ai';
 
+export { GenkitOrchestrator as Orchestrator } from './orchestrator'
+
 // references:
 // https://firebase.google.com/docs/genkit/auth
 // NOTE: This doesn't support "dynamic" negotation with the API
