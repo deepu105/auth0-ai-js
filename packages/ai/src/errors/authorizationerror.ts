@@ -2,21 +2,18 @@
 // https://datatracker.ietf.org/doc/html/rfc9470
 
 export class AuthorizationError extends Error {
-  code
+  code: string
+  acr: string[]
+  maxAge: number
   scope: string[]
-  acrValues
-  maxAge
-  realm
+  realm: string
   
-  constructor(message, code, params) {
+  constructor(message: string, code: string, params: { acr: string[], maxAge: number, scope: string[], realm: string }) {
     super(message);
     
-    if (typeof params == 'string') {
-      params = { scope: params };
-    }
     this.code = code;
     this.scope = params.scope; // TODO: split into array
-    this.acrValues = params.acrValues; // TODO: split into array
+    this.acr = params.acr; // TODO: split into array
     this.maxAge = params.maxAge; // TODO: parse into int
     this.realm = params.realm;
   }
