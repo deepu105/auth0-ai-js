@@ -1,10 +1,13 @@
+import { Agent } from './agent';
+import { Authorizer } from './authorizer';
+import { Store } from './history/store';
 
 import type { CIBAAuthorizer } from "./ciba-authorizer";
 
 export class Orchestrator {
   agent
-  authorizer : CIBAAuthorizer
-  historyStore
+  authorizer: Authorizer
+  historyStore: Store
   
   constructor() {
     console.log('new base orchestrator...');
