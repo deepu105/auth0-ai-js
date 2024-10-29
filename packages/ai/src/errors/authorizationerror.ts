@@ -3,18 +3,30 @@
 
 export class AuthorizationError extends Error {
   code: string
-  acr: string[]
+  acrValues: string[]
   maxAge: number
   scope: string[]
   realm: string
   
-  constructor(message: string, code: string, params: { acr: string[], maxAge: number, scope: string[], realm: string }) {
+  constructor(message: string, code: string, params: { acrValues: string[] | string, maxAge: number | string, scope: string[] | string, realm: string }) {
     super(message);
     
     this.code = code;
-    this.scope = params.scope; // TODO: split into array
-    this.acr = params.acr; // TODO: split into array
-    this.maxAge = params.maxAge; // TODO: parse into int
+    if (typeof params.scope === 'string') {
+      this.scope = params.scope.split(' ');
+    } else {
+      this.scope = params.scope;
+    }
+    if (typeof params.acrValues === 'string') {
+      this.acrValues = params.acrValues.split(' ');
+    } else {
+      this.acrValues = params.acrValues;
+    }
+    if (typeof params.maxAge === 'string') {
+      this.maxAge = parseInt(params.maxAge);
+    } else {
+      this.maxAge = params.maxAge;
+    }
     this.realm = params.realm;
   }
 }
