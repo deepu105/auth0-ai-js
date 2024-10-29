@@ -94,7 +94,7 @@ export class GenkitOrchestrator extends Orchestrator {
         if (ex instanceof AuthorizationError) {
           console.log('Authorization...');
           
-          var transactionID = await this.authorizer.authorize("stock.buy");
+          var transactionID = await this.authorizer.authorize([ "stock.buy" ]);
 
           var hist = llmResponse.toHistory();
 

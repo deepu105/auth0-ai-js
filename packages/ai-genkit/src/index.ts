@@ -98,7 +98,7 @@ export async function loop(generate, params, ctx) {
         console.log('Authorization...');
         
         var authorizer = new CIBAAuthorizer('http://localhost:3000/ciba/bc-authorize');
-        var tid = await authorizer.authorize('stock.buy');
+        var tid = await authorizer.authorize([ 'stock.buy' ]);
         
         console.log(tid);
         var hist = llmResponse.toHistory();

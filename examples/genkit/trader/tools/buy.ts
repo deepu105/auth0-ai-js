@@ -11,7 +11,7 @@ export let buy = async function({ ticker, qty }) {
   var store = agentAsyncStorage.getStore();
   console.log(store);
   if (!store.token) {
-    throw new AuthorizationError('You need authorization to buy stock', 'insufficient_scope', 'stock.buy');
+    throw new AuthorizationError('You need authorization to buy stock', 'insufficient_scope', { scope: [ 'stock.buy' ] });
   }
   
   
