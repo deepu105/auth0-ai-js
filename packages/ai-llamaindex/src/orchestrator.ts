@@ -23,7 +23,7 @@ export class LlamaIndexOrchestrator extends Orchestrator {
         //console.log(ex.scope);
         
         if (ex instanceof AuthorizationError) {
-          var transactionID = await this.authorizer.authorize([ "stock.buy" ]);
+          var transactionID = await this.authorizer.authorize(ex);
 
           // Slice off the last message, under the assumption that it was a tool call that failed
           // TODO: make this more robust by checking

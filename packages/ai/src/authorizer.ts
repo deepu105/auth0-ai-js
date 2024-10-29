@@ -1,3 +1,5 @@
+import { AuthorizationOptions } from './errors/authorizationerror';
+
 export interface Authorizer {
-  authorize(scope: string[]);
+  authorize(params: AuthorizationOptions);
 }

@@ -1,6 +1,14 @@
 // https://datatracker.ietf.org/doc/html/rfc6750
 // https://datatracker.ietf.org/doc/html/rfc9470
 
+export interface AuthorizationOptions {
+  acrValues: string[] | string;
+  maxAge: number | string;
+  scope: string[] | string;
+  realm: string
+}
+
+
 export class AuthorizationError extends Error {
   code: string
   acrValues: string[]
@@ -8,7 +16,7 @@ export class AuthorizationError extends Error {
   scope: string[]
   realm: string
   
-  constructor(message: string, code: string, params: { acrValues: string[] | string, maxAge: number | string, scope: string[] | string, realm: string }) {
+  constructor(message: string, code: string, params: AuthorizationOptions) {
     super(message);
     
     this.code = code;

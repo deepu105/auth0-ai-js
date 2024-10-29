@@ -1,13 +1,16 @@
-export class CIBAAuthorizer {
+import { Authorizer } from './authorizer'
+import { AuthorizationError } from './errors/authorizationerror'
+
+export class CIBAAuthorizer implements Authorizer {
   url
   
   constructor(url: string) {
     this.url = url;
   }
   
-  async authorize(scope: string[]) {
+  async authorize(params: AuthorizationError) {
     var body = {
-      scope: scope.join(' ')
+      scope: params.scope.join(' ')
     }
     // TODO: acr_values
     // TODO: id_token_hint

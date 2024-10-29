@@ -94,11 +94,12 @@ export async function loop(generate, params, ctx) {
       //console.log(this);
       //console.log(params)
       
+      /*
       if (ex instanceof AuthorizationError) {
         console.log('Authorization...');
         
         var authorizer = new CIBAAuthorizer('http://localhost:3000/ciba/bc-authorize');
-        var tid = await authorizer.authorize([ 'stock.buy' ]);
+        var tid = await authorizer.authorize({ scope: [ 'stock.buy' ] });
         
         console.log(tid);
         var hist = llmResponse.toHistory();
@@ -113,6 +114,7 @@ export async function loop(generate, params, ctx) {
         await store.store(tid, messages);
         return;
       }
+      */
     }
   });
 }
