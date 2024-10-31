@@ -22,6 +22,18 @@ a person.  Common use cases include:
 - **Async user confirmation**: Allow agents to operate autonomously in the
   background while requiring human approval when needed.
 
+## Packages
+
+- [`@auth0/ai`](https://github.com/atko-cic-lab/auth0-ai-js/tree/main/packages/ai) -
+  Base abstractions for authentication and authorization in AI applications.
+
+- [`@auth0/ai-genkit`](https://github.com/atko-cic-lab/auth0-ai-js/tree/main/packages/ai-genkit) -
+  Integration with [Genkit](https://firebase.google.com/docs/genkit) framework.
+
+- [`@auth0/ai-llamaindex`](https://github.com/atko-cic-lab/auth0-ai-js/tree/main/packages/ai-llamaindex) -
+  Integration with [LlamaIndex.TS](https://ts.llamaindex.ai/) framework.
+
+
 ## Running examples
 
 1. Install depedencies for the workspace
