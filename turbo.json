@@ -5,6 +5,9 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
+    "doc": {
+      "outputs": ["docs"]
+    },
     "dev": {
       "persistent": true,
       "cache": false
