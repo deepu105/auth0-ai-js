@@ -19,7 +19,7 @@ a person.  Common use cases include:
 - **Authorization for RAG**: Generate more relevant responses while ensuring
   that the agent is only incorporating information that the user has access to.
 	
-- **Async User Confirmation**: Allow agents to operate autonomously in the
+- **Async user confirmation**: Allow agents to operate autonomously in the
   background while requiring human approval when needed.
 
 ## Running examples
