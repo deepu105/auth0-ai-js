@@ -22,12 +22,10 @@ export class Orchestrator {
     // TODO: make this more generic, so it supports other CIBA bindings other than polling
     console.log('watch: ' + transactionID);
     
-    var self = this;
+    const self = this;
     
-    var handle = setInterval(async function() {
-      console.log('polling...');
-      
-      var body = {
+    const handle = setInterval(async function() {
+      const body = {
         grant_type: 'urn:openid:params:grant-type:ciba',
         auth_req_id: transactionID
       }
@@ -41,21 +39,17 @@ export class Orchestrator {
         // ...
       });
     
-      var json = await response.json();
-      console.log(json)
+      const json = await response.json();
       if (json.error == 'authorization_pending') { return; }
       if (json.error == 'access_denied') {
         clearInterval(handle);
         return;
       }
       
-      var token = json.access_token;
-      console.log('got token: ' + token);
+      const token = json.access_token;
       clearInterval(handle);
       self.resume(transactionID, token);
     }, 1000)
-    
-    
   }
   
   async resume(transactionID, token) {

@@ -1,6 +1,10 @@
 import { Authorizer } from './authorizer'
 import { AuthorizationError } from './errors/authorizationerror'
 
+/**
+ * Requests authorization by prompting the user via an out-of-band channel from
+ * the backend.
+ */
 export class CIBAAuthorizer implements Authorizer {
   url
   
