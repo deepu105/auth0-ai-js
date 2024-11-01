@@ -14,6 +14,7 @@ export class CIBAAuthorizer implements Authorizer {
   
   async authorize(params: AuthorizationOptions) {
     var body = {}
+    if (params.acrValues) { body.acr_values = params.acrValues.join(' ') }
     if (params.scope) { body.scope = params.scope.join(' ') }
     
     // TODO: acr_values
