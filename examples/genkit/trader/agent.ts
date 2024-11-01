@@ -63,39 +63,13 @@ const main = defineCommand({
     }
     
     prompt(gpt4o, [ buyTool], args.message);
-    
-    /*
-    const agent = new OpenAIAgent({
-      tools: [ buyTool ],
-      verbose: true
-    });
-    
-    
-    if (args.thread) {
-      resume(agent, args.thread, args.token);
-      return;
-    }
-    
-    prompt(agent, args.message);
-    */
   },
 });
 
 runMain(main);
 
-async function resume(model, tools, threadID, token) {
-  console.log('resume...');
-  
-  const result = await reenterLoop(generate, { model: model, tools: tools }, threadID, { token: token });
-  if (result) {
-    console.log(result.text())
-  }
-}
-
 async function prompt(model, tools, message) {
-  console.log('prompt.')
   const app = new Orchestrator();
-  //app.agent = agent;
   app.agent = new Agent(generate, model, tools)
   app.authorizer = new CIBAAuthorizer("http://localhost:3000/oauth2/bc-authorize");
   app.historyStore = new FSStore(".");
@@ -108,18 +82,5 @@ async function prompt(model, tools, message) {
   });
   if (response) {
     console.log(response.message);
-  }
-  
-  return;
-  
-  const result = await loop(generate, {
-    model: model,
-    prompt: message,
-    tools: tools
-  });
-
-  //console.log('=== DONE ===');
-  if (result) {
-    console.log(result.text())
   }
 }
