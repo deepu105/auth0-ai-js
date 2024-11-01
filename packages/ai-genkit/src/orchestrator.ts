@@ -34,19 +34,19 @@ export class GenkitOrchestrator extends Orchestrator {
           const toolResponses = await Promise.all(
             toolRequests.map(async (part) => {
             
-              console.log(part)
+              //console.log(part)
             
               const tool = params.tools.find((tool) => tool.__action.name == part.toolRequest.name);
-              console.log('exec');
-              console.log(tool);
+              //console.log('exec');
+              //console.log(tool);
             
               if (!tool) {
                 throw Error('Tool not found');
               }
             
               const output = await tool(tool.__action.inputSchema.parse(part.toolRequest?.input));
-              console.log('---- output ---');
-              console.log(output);
+              //console.log('---- output ---');
+              //console.log(output);
             
               return {
                 toolResponse: {
@@ -70,7 +70,7 @@ export class GenkitOrchestrator extends Orchestrator {
                 //}
               }));
         
-          console.log('called tools, looping...');
+          //console.log('called tools, looping...');
         
           //generateOptions.history = llmResponse.toHistory();
           //generateOptions.prompt = toolResponses;
@@ -85,14 +85,14 @@ export class GenkitOrchestrator extends Orchestrator {
       
         //return await generate(params);
       } catch (ex) {
-        console.log('???')
-        console.log(ex)
-        console.log(ex.scope);
+        //console.log('???')
+        ////console.log(ex)
+        //console.log(ex.scope);
         //console.log(this);
         //console.log(params)
       
         if (ex instanceof AuthorizationError) {
-          console.log('Authorization...');
+          //console.log('Authorization...');
           
           var transactionID = await this.authorizer.authorize(ex);
 
@@ -131,9 +131,9 @@ export class GenkitOrchestrator extends Orchestrator {
   }
   
   async resume(transactionID, token) {
-    console.log('genkit resume');
-    console.log(transactionID);
-    console.log(token);
+    //console.log('genkit resume');
+    //console.log(transactionID);
+    //console.log(token);
     
     
     var messages = await this.historyStore.load(transactionID);
@@ -141,8 +141,8 @@ export class GenkitOrchestrator extends Orchestrator {
     console.log(messages);
     // FIXME: pass in chat history correctly
     var text = messages[0].content[0].text;
-    console.log('REPROMPT');
-    console.log(text);
+    //console.log('REPROMPT');
+    //console.log(text);
     
     var response = await this.promptEx(this.agent.generate, {
       prompt: text,
