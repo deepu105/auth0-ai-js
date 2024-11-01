@@ -13,9 +13,9 @@ export class CIBAAuthorizer implements Authorizer {
   }
   
   async authorize(params: AuthorizationOptions) {
-    var body = {
-      scope: params.scope?.join(' ')
-    }
+    var body = {}
+    if (params.scope) { body.scope = params.scope.join(' ') }
+    
     // TODO: acr_values
     // TODO: id_token_hint
     // TODO: login_hint
@@ -29,7 +29,7 @@ export class CIBAAuthorizer implements Authorizer {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: new URLSearchParams(body),
+      body: new URLSearchParams(body).toString(),
       // ...
     });
     
