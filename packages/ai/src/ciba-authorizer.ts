@@ -1,5 +1,5 @@
 import { Authorizer } from './authorizer'
-import { AuthorizationError } from './errors/authorizationerror'
+import { AuthorizationError, AuthorizationOptions } from './errors/authorizationerror'
 
 /**
  * Requests authorization by prompting the user via an out-of-band channel from
@@ -12,9 +12,9 @@ export class CIBAAuthorizer implements Authorizer {
     this.url = url;
   }
   
-  async authorize(params: AuthorizationError) {
+  async authorize(params: AuthorizationOptions) {
     var body = {
-      scope: params.scope.join(' ')
+      scope: params.scope?.join(' ')
     }
     // TODO: acr_values
     // TODO: id_token_hint
