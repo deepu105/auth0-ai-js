@@ -3,6 +3,10 @@
   "version": "0.0.0",
   "description": "",
   "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./tokens": "./dist/tokens.js"
+  },
   "scripts": {
     "build": "tsc",
     "doc": "typedoc src/index.ts",

@@ -49,7 +49,7 @@ export class LlamaIndexOrchestrator extends Orchestrator {
     var messages = await this.historyStore.load(transactionID);
     // FIXME: pass in chat history correctly
     this.agent.reset();
-    var response = await this.prompt(messages[0].content, { token: token })
+    var response = await this.prompt(messages[0].content, { tokens: { accessToken: token } })
     if (response) {
       console.log(response.message);
     }
