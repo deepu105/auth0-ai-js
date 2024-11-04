@@ -1,4 +1,4 @@
-import { Orchestrator, AuthorizationError, agentAsyncStorage } from "@auth0/ai";
+import { Orchestrator, AuthorizationError } from "@auth0/ai";
 
 export class GenkitOrchestrator extends Orchestrator {
   
@@ -12,7 +12,8 @@ export class GenkitOrchestrator extends Orchestrator {
     //console.log('genkit prompting...');
     //console.log(message)
     
-    return agentAsyncStorage.run(ctx || {}, async () => {
+    //return agentAsyncStorage.run(ctx || {}, async () => {
+    return this.run(ctx || {}, async () => {
       let llmResponse;
     
       try {
@@ -148,7 +149,7 @@ export class GenkitOrchestrator extends Orchestrator {
       prompt: text,
       tools: this.agent.tools,
       model: this.agent.model
-    }, { token: token });
+    }, { tokens: { accessToken: token } });
     
     if (response) {
       console.log(response.text());

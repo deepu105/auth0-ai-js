@@ -1,5 +1,5 @@
-import { agentAsyncStorage } from '@auth0/ai';
 import { AuthorizationError } from '@auth0/ai';
+import { tokens } from '@auth0/ai/tokens';
 
 export let buy = async function({ ticker, qty }) {
   //console.log('buy stock!');
@@ -8,9 +8,8 @@ export let buy = async function({ ticker, qty }) {
   //console.log('BUY: ' + qty + ' ' + ticker);
   
   
-  var store = agentAsyncStorage.getStore();
-  //console.log(store);
-  if (!store.token) {
+  const accessToken = tokens().accessToken;
+  if (!accessToken) {
     throw new AuthorizationError('You need authorization to buy stock', 'insufficient_scope', { scope: [ 'stock.buy' ] });
   }
   
