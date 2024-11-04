@@ -1,19 +1,15 @@
-import { Orchestrator, AuthorizationError, agentAsyncStorage } from "@auth0/ai";
+import { Orchestrator, AuthorizationError } from "@auth0/ai";
 
 export class LlamaIndexOrchestrator extends Orchestrator {
   
   constructor() {
     super();
-    console.log('new llamaindex orchestrator...');
   }
   
   async prompt(message, ctx) {
-    console.log('llama prompting...');
-    console.log(message)
-    
     // TODO: make this agent interface generic
     
-    return agentAsyncStorage.run(ctx || {}, async () => {
+    return this.run(ctx || {}, async () => {
       try {
         const response = await this.agent.chat({ message: message });
         return response;
@@ -39,8 +35,6 @@ export class LlamaIndexOrchestrator extends Orchestrator {
         // TODO: Feed other errors back into agent
       }
     });
-    
-    
   }
   
   async resume(transactionID, token) {

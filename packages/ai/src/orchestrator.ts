@@ -1,6 +1,7 @@
 import { Agent } from './agent';
 import { Authorizer } from './authorizer';
 import { Store } from './history/store';
+import { agentAsyncStorage } from './async-storage';
 
 import type { CIBAAuthorizer } from "./ciba-authorizer";
 
@@ -16,6 +17,12 @@ export class Orchestrator {
   async prompt(message, ctx) {
     console.log('prompting...');
     console.log(message)
+  }
+  
+  async run(ctx, callback) {
+    return agentAsyncStorage.run(ctx, async () => {
+      return callback();
+    });
   }
   
   watch(transactionID) {
