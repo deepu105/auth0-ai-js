@@ -13,7 +13,10 @@ export class CIBAAuthorizer implements Authorizer {
   }
   
   async authorize(params: AuthorizationOptions) {
-    var body = {}
+    var body: {
+      acr_values?: string;
+      scope?: string
+    } = {}
     if (params.acrValues) { body.acr_values = params.acrValues.join(' ') }
     if (params.scope) { body.scope = params.scope.join(' ') }
     
