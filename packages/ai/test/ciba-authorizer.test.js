@@ -16,6 +16,28 @@ describe('CIBAAuthorizer#authorize', () => {
   
   describe('#authorize', async () => {
     
+    it('should request authorization with login hint', async () => {
+      vi.stubGlobal('fetch', vi.fn(() => {
+        return Promise.resolve({
+          ok: true,
+          json: () => {
+            return Promise.resolve({ auth_req_id: '1c266114-a1be-4252-8ad1-04986c5b9ac1' });
+          }
+        })
+      }))
+    
+      const authorizer = new CIBAAuthorizer('http://example.test/bc-authorize')
+      const x = await authorizer.authorize({ loginHint: 'janedoe@example.com', scope: [ 'openid' ] })
+      expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'login_hint=janedoe%40example.com&scope=openid'
+      });
+      expect(x).toEqual('1c266114-a1be-4252-8ad1-04986c5b9ac1')
+    }) // should request authorization with login hint
+    
     it('should request authorization with ACR value', async () => {
       vi.stubGlobal('fetch', vi.fn(() => {
         return Promise.resolve({
@@ -27,13 +49,13 @@ describe('CIBAAuthorizer#authorize', () => {
       }))
     
       const authorizer = new CIBAAuthorizer('http://example.test/bc-authorize')
-      const x = await authorizer.authorize({ scope: [ 'openid' ], acrValues: [ 'myACR' ] })
+      const x = await authorizer.authorize({ loginHint: 'janedoe@example.com', scope: [ 'openid' ], acrValues: [ 'myACR' ] })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: 'acr_values=myACR&scope=openid'
+        body: 'login_hint=janedoe%40example.com&acr_values=myACR&scope=openid'
       });
       expect(x).toEqual('1c266114-a1be-4252-8ad1-04986c5b9ac1')
     }) // should request authorization with ACR value

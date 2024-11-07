@@ -2,6 +2,7 @@
 // https://datatracker.ietf.org/doc/html/rfc9470
 
 export interface AuthorizationOptions {
+  loginHint?: string;
   acrValues?: string[];
   maxAge?: number;
   scope?: string[];

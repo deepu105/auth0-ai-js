@@ -30,6 +30,7 @@ export class CIBAAuthorizer implements Authorizer {
   async authorize(params: AuthorizationOptions) {
     var headers = {};
     var body: {
+      login_hint?: string;
       acr_values?: string;
       scope?: string
     } = {}
@@ -38,8 +39,11 @@ export class CIBAAuthorizer implements Authorizer {
       headers['Authorization'] = 'Basic ' + Buffer.from([ this.clientID, this.clientSecret ].join(':')).toString('base64')
     }
     
+    if (params.loginHint) { body.login_hint = params.loginHint }
     if (params.acrValues) { body.acr_values = params.acrValues.join(' ') }
     if (params.scope) { body.scope = params.scope.join(' ') }
+    
+    console.log(headers);
     
     // TODO: acr_values
     // TODO: id_token_hint
@@ -57,6 +61,9 @@ export class CIBAAuthorizer implements Authorizer {
     });
     
     var json = await response.json();
+    
+    console.log(json);
+    
     return json.auth_req_id;
   }
 }
