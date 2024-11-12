@@ -32,6 +32,10 @@ import { readDocuments } from "./helpers";
  * The output of the query depends on the user's permissions to view the documents.
  */
 async function main() {
+  console.log(
+    "\n..:: LlamaIndex Example: Retrievers with OKTA FGA (Fine-Grained Authorization)\n\n"
+  );
+
   // UserID
   const user = "user1";
   const documents = await readDocuments();
