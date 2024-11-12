@@ -7,9 +7,9 @@ import "dotenv/config";
 
 import { FGARetriever } from "@auth0/ai-langchain";
 
-import { readDocuments } from "./helpers";
-// Custom memory store
-import { MemoryStore } from "./memory-store";
+import { MemoryStore } from "./helpers/memory-store";
+// Read mock documents
+import { readDocuments } from "./helpers/read-documents";
 
 /**
  * Demonstrates the usage of the OKTA FGA (Fine-Grained Authorization)
@@ -50,11 +50,11 @@ async function main() {
   });
 
   const { answer } = await queryEngine.query({
-    query: "What was the salary in 2013?",
+    query: "Show me forecast for ZEKO?",
   });
 
   /**
-   * Output: The context provided does not specify a salary for the year 2013.
+   * Output: `The provided context does not include specific financial forecasts...`
    */
   console.log(answer);
 
@@ -63,9 +63,7 @@ async function main() {
    *
    *    { user: "user:user1", relation: "viewer", object: "doc:doc2" }
    *
-   * Then, the output will be:
-   *
-   *    Output: By 2013, my salary was $30k/year — almost twice what I made at my previous job. While low by US standards, it was pretty decent in Russia.
+   * Then, the output will be: `The forecast for Zeko Advanced Systems Inc. (ZEKO) for fiscal year 2025...`
    */
 }
 

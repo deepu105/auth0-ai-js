@@ -1,3 +1,8 @@
+/**
+ * LlamaIndex Example: Retrievers with OKTA FGA (Fine-Grained Authorization)
+ *
+ *
+ */
 import "dotenv/config";
 
 import { VectorStoreIndex } from "llamaindex";
@@ -30,10 +35,9 @@ async function main() {
   // UserID
   const user = "user1";
   const documents = await readDocuments();
-
   const vectorStoreIndex = await VectorStoreIndex.fromDocuments(documents);
 
-  const vsiQueryEngine = vectorStoreIndex.asQueryEngine({
+  const queryEngine = vectorStoreIndex.asQueryEngine({
     // Decorate the retriever with the FGARetriever to check the permissions.
     retriever: FGARetriever.adaptFGA({
       retriever: vectorStoreIndex.asRetriever(),
@@ -44,12 +48,13 @@ async function main() {
       }),
     }),
   });
-  const vsiResponse = await vsiQueryEngine.query({
-    query: "What was the salary in 2013?",
+
+  const vsiResponse = await queryEngine.query({
+    query: "Show me forecast for ZEKO?",
   });
 
   /**
-   * Output: The context does not provide specific information about the salary in 2013.
+   * Output: `The provided document does not contain any specific forecast information...`
    */
   console.log(vsiResponse.toString());
 
@@ -58,9 +63,7 @@ async function main() {
    *
    *    { user: "user:user1", relation: "viewer", object: "doc:doc2" }
    *
-   * Then, the output will be:
-   *
-   *    Output: By 2013, my salary was $30k/year — almost twice what I made at my previous job. While low by US standards, it was pretty decent in Russia.
+   * Then, the output will be: `The forecast for Zeko Advanced Systems Inc. (ZEKO) for fiscal year 2025...`
    */
 }
 

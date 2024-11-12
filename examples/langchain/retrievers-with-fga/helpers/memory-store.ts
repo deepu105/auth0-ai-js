@@ -21,7 +21,7 @@ class QueryEngine {
       | RunnableInterface<Record<string, any>, DocumentInterface[]>
   ) {
     const prompt = ChatPromptTemplate.fromTemplate(
-      `Answer the user's question: {input} based on the following context {context}`
+      `Answer the user's question: {input} based on the following context {context}. Only use the information provided in the context. If you need more information, ask for it.`
     );
     const combineDocsChain = await createStuffDocumentsChain({
       llm: new ChatOpenAI({ temperature: 0, modelName: "gpt-4o-mini" }),
