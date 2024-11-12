@@ -1,14 +1,15 @@
+/**
+ * Langchain Example: Retrievers with OKTA FGA (Fine-Grained Authorization)
+ *
+ *
+ */
 import "dotenv/config";
 
-import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
-import { createRetrievalChain } from "langchain/chains/retrieval";
-import { MemoryVectorStore } from "langchain/vectorstores/memory";
-
 import { FGARetriever } from "@auth0/ai-langchain";
-import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 
 import { readDocuments } from "./helpers";
+// Custom memory store
+import { MemoryStore } from "./memory-store";
 
 /**
  * Demonstrates the usage of the OKTA FGA (Fine-Grained Authorization)
@@ -34,36 +35,22 @@ async function main() {
   // UserID
   const user = "user1";
   const documents = await readDocuments();
-  const embeddings = new OpenAIEmbeddings();
-  const vectorStore = await MemoryVectorStore.fromDocuments(
-    documents,
-    embeddings
-  );
+  const vectorStore = await MemoryStore.fromDocuments(documents);
 
-  // Decorate the retriever with the FGARetriever to check the permissions.
-  const retriever = FGARetriever.adaptFGA({
-    retriever: vectorStore.asRetriever(),
-    buildQuery: (doc) => ({
-      user: `user:${user}`,
-      object: `doc:${doc.metadata.id}`,
-      relation: "viewer",
+  const queryEngine = await vectorStore.asQueryEngine({
+    // Decorate the retriever with the FGARetriever to check the permissions.
+    retriever: FGARetriever.adaptFGA({
+      retriever: vectorStore.asRetriever(),
+      buildQuery: (doc) => ({
+        user: `user:${user}`,
+        object: `doc:${doc.metadata.id}`,
+        relation: "viewer",
+      }),
     }),
   });
 
-  const prompt = ChatPromptTemplate.fromTemplate(
-    `Answer the user's question: {input} based on the following context {context}`
-  );
-  const combineDocsChain = await createStuffDocumentsChain({
-    llm: new ChatOpenAI({ temperature: 0, modelName: "gpt-4o-mini" }),
-    prompt,
-  });
-  const retrievalChain = await createRetrievalChain({
-    combineDocsChain,
-    retriever,
-  });
-
-  const { answer } = await retrievalChain.invoke({
-    input: "What was the salary in 2013?",
+  const { answer } = await queryEngine.query({
+    query: "What was the salary in 2013?",
   });
 
   /**
