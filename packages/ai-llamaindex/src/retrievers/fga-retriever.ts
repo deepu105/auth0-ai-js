@@ -1,21 +1,27 @@
-import { BaseNode, BaseRetriever, Metadata, NodeWithScore, QueryBundle } from "llamaindex";
+import {
+  BaseNode,
+  BaseRetriever,
+  Metadata,
+  NodeWithScore,
+  QueryBundle,
+} from "llamaindex";
 
-import { ClientCheckRequest, ConsistencyPreference, CredentialsMethod, OpenFgaClient } from "@openfga/sdk";
+import {
+  ClientCheckRequest,
+  ConsistencyPreference,
+  CredentialsMethod,
+  OpenFgaClient,
+} from "@openfga/sdk";
 
-export type FGARetrieverCheckerFn = (
-  user: string,
-  document: BaseNode<Metadata>
-) => {
+export type FGARetrieverCheckerFn = (document: BaseNode<Metadata>) => {
   user: string;
   object: string;
   relation: string;
 };
 
 export interface FGARetrieverProps {
-  user: string;
-  checkerFn: FGARetrieverCheckerFn;
+  buildQuery: FGARetrieverCheckerFn;
   retriever: BaseRetriever;
-  fgaClient?: OpenFgaClient;
 }
 
 /**
@@ -30,8 +36,8 @@ export interface FGARetrieverProps {
  */
 export class FGARetriever extends BaseRetriever {
   private retriever: BaseRetriever;
-  private user: string;
-  private checkerFn: FGARetrieverCheckerFn;
+
+  private buildQuery: FGARetrieverCheckerFn;
   private fgaClient: OpenFgaClient;
 
   static lc_name() {
@@ -40,11 +46,14 @@ export class FGARetriever extends BaseRetriever {
 
   lc_namespace = ["llamaindex", "retrievers", "fga-retriever"];
 
-  constructor({ user, checkerFn, retriever, fgaClient }: FGARetrieverProps) {
+  private constructor(
+    { buildQuery, retriever }: FGARetrieverProps,
+    fgaClient?: OpenFgaClient
+  ) {
     super();
-    this.user = user;
+
     this.retriever = retriever;
-    this.checkerFn = checkerFn;
+    this.buildQuery = buildQuery;
     this.fgaClient =
       fgaClient ||
       new OpenFgaClient({
@@ -61,6 +70,13 @@ export class FGARetriever extends BaseRetriever {
           },
         },
       });
+  }
+
+  static adaptFGA(
+    { buildQuery, retriever }: FGARetrieverProps,
+    fgaClient?: OpenFgaClient
+  ) {
+    return new FGARetriever({ buildQuery, retriever }, fgaClient);
   }
 
   /**
@@ -97,7 +113,7 @@ export class FGARetriever extends BaseRetriever {
 
     const { checks, documentToObjectMap } = retrievedNodes.reduce(
       (accumulator, nodeWithScore: NodeWithScore<Metadata>) => {
-        const permissionCheck = this.checkerFn(this.user, nodeWithScore.node);
+        const permissionCheck = this.buildQuery(nodeWithScore.node);
         accumulator.checks.push(permissionCheck);
         accumulator.documentToObjectMap.set(
           nodeWithScore,

@@ -1,8 +1,12 @@
 import "dotenv/config";
 
-import { VectorStoreIndex } from "llamaindex";
+import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
+import { createRetrievalChain } from "langchain/chains/retrieval";
+import { MemoryVectorStore } from "langchain/vectorstores/memory";
 
-import { FGARetriever } from "@auth0/ai-llamaindex";
+import { FGARetriever } from "@auth0/ai-langchain";
+import { ChatPromptTemplate } from "@langchain/core/prompts";
+import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 
 import { readDocuments } from "./helpers";
 
@@ -30,28 +34,42 @@ async function main() {
   // UserID
   const user = "user1";
   const documents = await readDocuments();
+  const embeddings = new OpenAIEmbeddings();
+  const vectorStore = await MemoryVectorStore.fromDocuments(
+    documents,
+    embeddings
+  );
 
-  const vectorStoreIndex = await VectorStoreIndex.fromDocuments(documents);
-
-  const vsiQueryEngine = vectorStoreIndex.asQueryEngine({
-    // Decorate the retriever with the FGARetriever to check the permissions.
-    retriever: FGARetriever.adaptFGA({
-      retriever: vectorStoreIndex.asRetriever(),
-      buildQuery: (document) => ({
-        user: `user:${user}`,
-        object: `doc:${document.metadata.id}`,
-        relation: "viewer",
-      }),
+  // Decorate the retriever with the FGARetriever to check the permissions.
+  const retriever = FGARetriever.adaptFGA({
+    retriever: vectorStore.asRetriever(),
+    buildQuery: (doc) => ({
+      user: `user:${user}`,
+      object: `doc:${doc.metadata.id}`,
+      relation: "viewer",
     }),
   });
-  const vsiResponse = await vsiQueryEngine.query({
-    query: "What was the salary in 2013?",
+
+  const prompt = ChatPromptTemplate.fromTemplate(
+    `Answer the user's question: {input} based on the following context {context}`
+  );
+  const combineDocsChain = await createStuffDocumentsChain({
+    llm: new ChatOpenAI({ temperature: 0, modelName: "gpt-4o-mini" }),
+    prompt,
+  });
+  const retrievalChain = await createRetrievalChain({
+    combineDocsChain,
+    retriever,
+  });
+
+  const { answer } = await retrievalChain.invoke({
+    input: "What was the salary in 2013?",
   });
 
   /**
-   * Output: The context does not provide specific information about the salary in 2013.
+   * Output: The context provided does not specify a salary for the year 2013.
    */
-  console.log(vsiResponse.toString());
+  console.log(answer);
 
   /**
    * If we add the following tuple to the OKTA FGA:
