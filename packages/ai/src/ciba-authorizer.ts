@@ -33,6 +33,7 @@ export class CIBAAuthorizer implements Authorizer {
       login_hint?: string;
       acr_values?: string;
       scope?: string
+      binding_message?: string
     } = {}
     
     if (this.clientID && this.clientSecret) {
@@ -42,10 +43,8 @@ export class CIBAAuthorizer implements Authorizer {
     if (params.loginHint) { body.login_hint = params.loginHint }
     if (params.acrValues) { body.acr_values = params.acrValues.join(' ') }
     if (params.scope) { body.scope = params.scope.join(' ') }
+    if (params.bindingMessage) { body.binding_message = params.bindingMessage }
     
-    console.log(headers);
-    
-    // TODO: acr_values
     // TODO: id_token_hint
     // TODO: login_hint
     // TODO: id_token_hint
@@ -61,9 +60,6 @@ export class CIBAAuthorizer implements Authorizer {
     });
     
     var json = await response.json();
-    
-    console.log(json);
-    
     return json.auth_req_id;
   }
 }
