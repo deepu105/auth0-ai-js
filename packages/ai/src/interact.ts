@@ -1,11 +1,9 @@
 import { agentAsyncStorage } from './async-storage';
 import { AuthorizationOptions, AuthorizationError } from './errors/authorizationerror';
 
-export function interact(fn, authorizer) {
-  console.log('interact...');
+export function interact(fn, authorizer, receiver) {
   
-  return async function(ctx, ...args) {
-    
+  const ifn = async function(ctx, ...args) {
     return agentAsyncStorage.run(ctx, async () => {
       const store = agentAsyncStorage.getStore();
       
@@ -34,19 +32,22 @@ export function interact(fn, authorizer) {
           params.maxAge = error.maxAge;
           params.scope = error.scope;
           params.realm = error.realm;
-
-          console.log('--');
-          console.log(store);
-
+          
           var transactionID = await authorizer.authorize(params);
-          console.log(transactionID)
-          return
+          var token = await receiver.receive(transactionID);
+          ctx.tokens = {
+            accessToken: token
+          };
+          return ifn.apply(undefined, arguments);
         }
         
+        // TODO
         
         console.log('RETHROW');
         console.log(error);
       }
     });
-  }
+  };
+  
+  return ifn;
 }
