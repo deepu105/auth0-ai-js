@@ -26,8 +26,8 @@ export class PollingCIBAAuthorizationReceiver {
         client_id: process.env['CLIENT_ID']
       }
       
-      console.log('BODY');
-      console.log(body);
+      //console.log('BODY');
+      //console.log(body);
       
       //const response = await fetch('http://localhost:3000/oauth2/token', {
       const response = await fetch('https://ai-117332.us.auth0.com/oauth/token', {
@@ -54,9 +54,9 @@ export class PollingCIBAAuthorizationReceiver {
       const token = json.access_token;
       clearInterval(handle);
       
-      console.log('RESUME IT');
-      console.log(transactionID);
-      console.log(token);
+      //console.log('RESUME IT');
+      //console.log(transactionID);
+      //console.log(token);
       
       return resolve(token);
       
