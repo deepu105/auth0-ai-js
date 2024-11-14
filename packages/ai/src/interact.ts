@@ -5,8 +5,6 @@ export function interact(fn, authorizer) {
   console.log('interact...');
   
   return async function(ctx, ...args) {
-    console.log('trying withing wrapper...');
-    
     
     return agentAsyncStorage.run(ctx, async () => {
       const store = agentAsyncStorage.getStore();
@@ -15,11 +13,6 @@ export function interact(fn, authorizer) {
         return await fn.apply(undefined, args);
       } catch (error) {
         if (error instanceof AuthorizationError) {
-          console.log('AUTHZ ERROR');
-          console.log(error);
-
-
-
           var params: AuthorizationOptions = {};
           if (store.user) {
             params.loginHint = store.user.id;
@@ -35,23 +28,7 @@ export function interact(fn, authorizer) {
 
           var transactionID = await authorizer.authorize(params);
           console.log(transactionID)
-
-
           return
-
-
-          /*
-          try {
-
-            console.log('awaiting authorization...');
-          var transactionID = await authorizer.authorize(error);
-          console.log(transactionID)
-          } catch (ex) {
-            console.log('new ex');
-            console.log(ex)
-          }
-          return
-          */
         }
         
         
