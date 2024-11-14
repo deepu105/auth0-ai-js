@@ -21,7 +21,7 @@ describe('Auth0CIBAAuthorizer#authorize', () => {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: 'acr_values=myACR&scope=purchase'
+      body: 'acr_values=myACR&scope=purchase&binding_message=IGNORE'
     });
     expect(x).toEqual('1c266114-a1be-4252-8ad1-04986c5b9ac1')
   }) // should send request to url
@@ -44,7 +44,7 @@ describe('Auth0CIBAAuthorizer#authorize', () => {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: 'acr_values=myACR&scope=purchase'
+      body: 'acr_values=myACR&scope=purchase&binding_message=IGNORE'
     });
     expect(x).toEqual('1c266114-a1be-4252-8ad1-04986c5b9ac1')
   }) // should send request to domain
@@ -68,7 +68,7 @@ describe('Auth0CIBAAuthorizer#authorize', () => {
         'Authorization': 'Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3',
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: 'acr_values=myACR&scope=purchase'
+      body: 'acr_values=myACR&scope=purchase&binding_message=IGNORE'
     });
     expect(x).toEqual('1c266114-a1be-4252-8ad1-04986c5b9ac1')
   }) // should send request to url passed as option
@@ -92,7 +92,7 @@ describe('Auth0CIBAAuthorizer#authorize', () => {
         'Authorization': 'Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3',
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      body: 'acr_values=myACR&scope=purchase'
+      body: 'acr_values=myACR&scope=purchase&binding_message=IGNORE'
     });
     expect(x).toEqual('1c266114-a1be-4252-8ad1-04986c5b9ac1')
   }) // should send request to domain passed as option

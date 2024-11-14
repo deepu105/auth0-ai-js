@@ -31,7 +31,9 @@ export class Auth0CIBAAuthorizer extends CIBAAuthorizer {
     url.pathname = '/';
      
     // Auth0 wants a JSON object, as recommended by FAPI...
-    params.loginHint = JSON.stringify({ format: 'iss_sub', iss: url.toString(), sub: params.loginHint });
+    if (params.loginHint) {
+      params.loginHint = JSON.stringify({ format: 'iss_sub', iss: url.toString(), sub: params.loginHint });
+    }
     // Auth0 always wants a binding mesage...
     if (!params.bindingMessage) { params.bindingMessage = 'IGNORE' }
     
