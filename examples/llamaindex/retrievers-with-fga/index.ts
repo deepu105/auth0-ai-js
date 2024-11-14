@@ -26,8 +26,8 @@ import { readDocuments } from "./helpers";
  * based on predefined tuples in OKTA FGA.
  *
  * Example:
- * - A tuple {user: "user:*", relation: "viewer", object: "doc:doc1"} allows all users to view "doc1".
- * - A tuple {user: "user:user1", relation: "viewer", object: "doc:doc2"} allows "user1" to view "doc2".
+ * - A tuple {user: "user:*", relation: "viewer", object: "doc:public-doc"} allows all users to view "public-doc".
+ * - A tuple {user: "user:user1", relation: "viewer", object: "doc:private-doc"} allows "user1" to view "private-doc".
  *
  * The output of the query depends on the user's permissions to view the documents.
  */
@@ -43,7 +43,7 @@ async function main() {
 
   const queryEngine = vectorStoreIndex.asQueryEngine({
     // Decorate the retriever with the FGARetriever to check the permissions.
-    retriever: FGARetriever.adaptFGA({
+    retriever: FGARetriever.create({
       retriever: vectorStoreIndex.asRetriever(),
       buildQuery: (document) => ({
         user: `user:${user}`,
@@ -65,7 +65,7 @@ async function main() {
   /**
    * If we add the following tuple to the OKTA FGA:
    *
-   *    { user: "user:user1", relation: "viewer", object: "doc:doc2" }
+   *    { user: "user:user1", relation: "viewer", object: "doc:private-doc" }
    *
    * Then, the output will be: `The forecast for Zeko Advanced Systems Inc. (ZEKO) for fiscal year 2025...`
    */

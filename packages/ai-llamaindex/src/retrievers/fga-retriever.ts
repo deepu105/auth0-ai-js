@@ -72,7 +72,7 @@ export class FGARetriever extends BaseRetriever {
       });
   }
 
-  static adaptFGA(
+  static create(
     { buildQuery, retriever }: FGARetrieverProps,
     fgaClient?: OpenFgaClient
   ) {
