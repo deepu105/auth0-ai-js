@@ -5,7 +5,6 @@ import {
   Document,
   retrieve,
   RetrieverArgument,
-  RetrieverParams,
 } from "@genkit-ai/ai/retriever";
 import { genkitPlugin } from "@genkit-ai/core";
 import {
