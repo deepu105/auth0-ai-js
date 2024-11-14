@@ -38,45 +38,6 @@ export class Orchestrator {
     this.resume(transactionID, token);
     
     return;
-    
-    const self = this;
-    
-    const handle = setInterval(async function() {
-      const body = {
-        grant_type: 'urn:openid:params:grant-type:ciba',
-        auth_req_id: transactionID,
-        client_id: process.env['CLIENT_ID']
-      }
-      
-      console.log('BODY');
-      console.log(body);
-      
-      //const response = await fetch('http://localhost:3000/oauth2/token', {
-      const response = await fetch('https://ai-117332.us.auth0.com/oauth/token', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Basic ' + Buffer.from([ process.env['CLIENT_ID'], process.env['CLIENT_SECRET'] ].join(':')).toString('base64'),
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams(body),
-        // ...
-      });
-    
-      const json = await response.json();
-      //clearInterval(handle);
-      //console.log(json)
-      //return
-      
-      if (json.error == 'authorization_pending') { return; }
-      if (json.error == 'access_denied') {
-        clearInterval(handle);
-        return;
-      }
-      
-      const token = json.access_token;
-      clearInterval(handle);
-      self.resume(transactionID, token);
-    }, 1000)
   }
   
   async resume(transactionID, token) {
