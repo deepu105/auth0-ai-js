@@ -6,6 +6,7 @@ export interface AuthorizationOptions {
   acrValues?: string[];
   maxAge?: number;
   scope?: string[];
+  bindingMessage?: string;
   realm?: string
 }
 

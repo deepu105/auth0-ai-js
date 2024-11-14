@@ -1,45 +1,23 @@
-import { Agent } from './agent';
-import { Authorizer, Receiver } from './authorizer';
-import { Store } from './history/store';
-import { agentAsyncStorage } from './async-storage';
+import { CIBAAuthorizerOptions } from '../ciba-authorizer'
 
-import type { CIBAAuthorizer } from "./ciba-authorizer";
-
-export class Orchestrator {
-  agent
-  authorizer: Authorizer
-  receiver: Receiver
-  historyStore: Store
+export class PollingCIBAAuthorizationReceiver {
+  url
+  clientID
+  clientSecret
   
-  constructor() {
-    console.log('new base orchestrator...');
+  constructor(options: string | CIBAAuthorizerOptions) {
+    if (typeof options === 'string') {
+      this.url = options;
+    } else {
+      this.url = options.url;
+      this.clientID = options.clientID;
+      this.clientSecret = options.clientSecret;
+    }
   }
   
-  async prompt(message, ctx) {
-    console.log('prompting...');
-    console.log(message)
-  }
-  
-  async run(ctx, callback) {
-    return agentAsyncStorage.run(ctx, async () => {
-      return callback();
-    });
-  }
-  
-  async watch(transactionID) {
-    // TODO: make this more generic, so it supports other CIBA bindings other than polling
-    console.log('watch: ' + transactionID);
+  async receive(transactionID: string) {
+    return new Promise(function(resolve, reject) {
     
-    
-    var token = await this.receiver.receive(transactionID);
-    
-    console.log('GOT WTACH TOKEN');
-    console.log(token)
-    this.resume(transactionID, token);
-    
-    return;
-    
-    const self = this;
     
     const handle = setInterval(async function() {
       const body = {
@@ -75,10 +53,17 @@ export class Orchestrator {
       
       const token = json.access_token;
       clearInterval(handle);
-      self.resume(transactionID, token);
-    }, 1000)
+      
+      console.log('RESUME IT');
+      console.log(transactionID);
+      console.log(token);
+      
+      return resolve(token);
+      
+      //self.resume(transactionID, token);
+    }, 1000);
+    
+    })
   }
   
-  async resume(transactionID, token) {
-  }
 }
