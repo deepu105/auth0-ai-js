@@ -26,4 +26,16 @@ export class Auth0CIBAAuthorizer extends CIBAAuthorizer {
     }
   }
   
+  async authorize(params: AuthorizationOptions) {
+    const url = new URL(this.url);
+    url.pathname = '/';
+     
+    // Auth0 wants a JSON object, as recommended by FAPI...
+    params.loginHint = JSON.stringify({ format: 'iss_sub', iss: url.toString(), sub: params.loginHint });
+    // Auth0 always wants a binding mesage...
+    if (!params.bindingMessage) { params.bindingMessage = 'IGNORE' }
+    
+    return super.authorize(params);
+  }
+  
 }
