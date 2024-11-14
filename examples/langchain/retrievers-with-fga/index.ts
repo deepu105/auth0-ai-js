@@ -1,15 +1,15 @@
 /**
- * LlamaIndex Example: Retrievers with OKTA FGA (Fine-Grained Authorization)
+ * Langchain Example: Retrievers with OKTA FGA (Fine-Grained Authorization)
  *
  *
  */
 import "dotenv/config";
 
-import { VectorStoreIndex } from "llamaindex";
+import { FGARetriever } from "@auth0/ai-langchain";
 
-import { FGARetriever } from "@auth0/ai-llamaindex";
-
-import { readDocuments } from "./helpers";
+import { MemoryStore } from "./helpers/memory-store";
+// Read mock documents
+import { readDocuments } from "./helpers/read-documents";
 
 /**
  * Demonstrates the usage of the OKTA FGA (Fine-Grained Authorization)
@@ -33,34 +33,34 @@ import { readDocuments } from "./helpers";
  */
 async function main() {
   console.log(
-    "\n..:: LlamaIndex Example: Retrievers with OKTA FGA (Fine-Grained Authorization)\n\n"
+    "\n..:: Langchain Example: Retrievers with OKTA FGA (Fine-Grained Authorization)\n\n"
   );
 
   // UserID
   const user = "user1";
   const documents = await readDocuments();
-  const vectorStoreIndex = await VectorStoreIndex.fromDocuments(documents);
+  const vectorStore = await MemoryStore.fromDocuments(documents);
 
-  const queryEngine = vectorStoreIndex.asQueryEngine({
+  const queryEngine = await vectorStore.asQueryEngine({
     // Decorate the retriever with the FGARetriever to check the permissions.
     retriever: FGARetriever.adaptFGA({
-      retriever: vectorStoreIndex.asRetriever(),
-      buildQuery: (document) => ({
+      retriever: vectorStore.asRetriever(),
+      buildQuery: (doc) => ({
         user: `user:${user}`,
-        object: `doc:${document.metadata.id}`,
+        object: `doc:${doc.metadata.id}`,
         relation: "viewer",
       }),
     }),
   });
 
-  const vsiResponse = await queryEngine.query({
+  const { answer } = await queryEngine.query({
     query: "Show me forecast for ZEKO?",
   });
 
   /**
-   * Output: `The provided document does not contain any specific forecast information...`
+   * Output: `The provided context does not include specific financial forecasts...`
    */
-  console.log(vsiResponse.toString());
+  console.log(answer);
 
   /**
    * If we add the following tuple to the OKTA FGA:

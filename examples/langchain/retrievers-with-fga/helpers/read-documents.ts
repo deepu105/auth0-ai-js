@@ -1,5 +1,6 @@
-import { Document } from "llamaindex";
 import fs from "node:fs/promises";
+
+import { Document } from "@langchain/core/documents";
 
 async function readDoc(path: string) {
   return await fs.readFile(path, "utf-8");
@@ -7,13 +8,13 @@ async function readDoc(path: string) {
 
 export async function readDocuments() {
   const document1 = new Document({
-    text: await readDoc("./assets/docs/doc1.md"),
+    pageContent: await readDoc("./assets/docs/doc1.md"),
     metadata: {
       id: "doc1",
     },
   });
   const document2 = new Document({
-    text: await readDoc("./assets/docs/doc2.md"),
+    pageContent: await readDoc("./assets/docs/doc2.md"),
     metadata: {
       id: "doc2",
     },
