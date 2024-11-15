@@ -13,6 +13,7 @@
     "examples/llamaindex/trader",
     "examples/llamaindex/retrievers-with-fga",
     "examples/langchain/retrievers-with-fga",
+    "examples/genkit/retrievers-with-fga",
     "examples/genkit/trader"
   ]
 }

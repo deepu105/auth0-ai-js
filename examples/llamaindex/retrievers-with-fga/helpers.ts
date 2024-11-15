@@ -7,15 +7,15 @@ async function readDoc(path: string) {
 
 export async function readDocuments() {
   const document1 = new Document({
-    text: await readDoc("./assets/docs/doc1.md"),
+    text: await readDoc("./assets/docs/public-doc.md"),
     metadata: {
-      id: "doc1",
+      id: "public-doc",
     },
   });
   const document2 = new Document({
-    text: await readDoc("./assets/docs/doc2.md"),
+    text: await readDoc("./assets/docs/private-doc.md"),
     metadata: {
-      id: "doc2",
+      id: "private-doc",
     },
   });
 

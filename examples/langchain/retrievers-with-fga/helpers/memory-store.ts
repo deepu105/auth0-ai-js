@@ -8,18 +8,20 @@ import { BaseRetrieverInterface } from "@langchain/core/retrievers";
 import { Runnable, RunnableInterface } from "@langchain/core/runnables";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 
-class QueryEngine {
+export class RetrievalChain {
   private engine: Runnable;
 
   private constructor(engine: Runnable) {
     this.engine = engine;
   }
 
-  static async create(
+  static async create({
+    retriever,
+  }: {
     retriever:
       | BaseRetrieverInterface
-      | RunnableInterface<Record<string, any>, DocumentInterface[]>
-  ) {
+      | RunnableInterface<Record<string, any>, DocumentInterface[]>;
+  }) {
     const prompt = ChatPromptTemplate.fromTemplate(
       `Answer the user's question: {input} based on the following context {context}. Only use the information provided in the context. If you need more information, ask for it.`
     );
@@ -32,7 +34,7 @@ class QueryEngine {
       retriever,
     });
 
-    return new QueryEngine(retrievalChain);
+    return new RetrievalChain(retrievalChain);
   }
 
   async query({ query }: { query: string }) {
@@ -59,16 +61,6 @@ export class MemoryStore {
     );
 
     return new MemoryStore(vectorStore);
-  }
-
-  async asQueryEngine({
-    retriever,
-  }: {
-    retriever:
-      | BaseRetrieverInterface
-      | RunnableInterface<Record<string, any>, DocumentInterface[]>;
-  }) {
-    return QueryEngine.create(retriever);
   }
 
   asRetriever() {

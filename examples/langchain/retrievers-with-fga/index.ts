@@ -7,8 +7,7 @@ import "dotenv/config";
 
 import { FGARetriever } from "@auth0/ai-langchain";
 
-import { MemoryStore } from "./helpers/memory-store";
-// Read mock documents
+import { MemoryStore, RetrievalChain } from "./helpers/memory-store";
 import { readDocuments } from "./helpers/read-documents";
 
 /**
@@ -18,16 +17,16 @@ import { readDocuments } from "./helpers/read-documents";
  * It performs the following steps:
  *    1. Defines a user ID.
  *    2. Reads documents from a data source.
- *    3. Creates a VectorStoreIndex from the documents.
- *    4. Sets up a query engine with an FGARetriever to enforce permissions.
+ *    3. Creates a MemoryStore from the documents.
+ *    4. Sets up a retrievalChain with an FGARetriever to enforce permissions.
  *    5. Executes a query and logs the response.
  *
  * The FGARetriever checks if the user has the "viewer" relation to the document
  * based on predefined tuples in OKTA FGA.
  *
  * Example:
- * - A tuple {user: "user:*", relation: "viewer", object: "doc:doc1"} allows all users to view "doc1".
- * - A tuple {user: "user:user1", relation: "viewer", object: "doc:doc2"} allows "user1" to view "doc2".
+ * - A tuple {user: "user:*", relation: "viewer", object: "doc:public-doc"} allows all users to view "public-doc".
+ * - A tuple {user: "user:user1", relation: "viewer", object: "doc:private-doc"} allows "user1" to view "private-doc".
  *
  * The output of the query depends on the user's permissions to view the documents.
  */
@@ -40,10 +39,9 @@ async function main() {
   const user = "user1";
   const documents = await readDocuments();
   const vectorStore = await MemoryStore.fromDocuments(documents);
-
-  const queryEngine = await vectorStore.asQueryEngine({
+  const retrievalChain = await RetrievalChain.create({
     // Decorate the retriever with the FGARetriever to check the permissions.
-    retriever: FGARetriever.adaptFGA({
+    retriever: FGARetriever.create({
       retriever: vectorStore.asRetriever(),
       buildQuery: (doc) => ({
         user: `user:${user}`,
@@ -53,7 +51,7 @@ async function main() {
     }),
   });
 
-  const { answer } = await queryEngine.query({
+  const { answer } = await retrievalChain.query({
     query: "Show me forecast for ZEKO?",
   });
 
@@ -65,7 +63,7 @@ async function main() {
   /**
    * If we add the following tuple to the OKTA FGA:
    *
-   *    { user: "user:user1", relation: "viewer", object: "doc:doc2" }
+   *    { user: "user:user1", relation: "viewer", object: "doc:private-doc" }
    *
    * Then, the output will be: `The forecast for Zeko Advanced Systems Inc. (ZEKO) for fiscal year 2025...`
    */

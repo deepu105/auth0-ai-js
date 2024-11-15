@@ -72,7 +72,7 @@ export class FGARetriever extends BaseRetriever {
       });
   }
 
-  static adaptFGA(
+  static create(
     { buildQuery, retriever }: FGARetrieverProps,
     fgaClient?: OpenFgaClient
   ) {
@@ -85,7 +85,7 @@ export class FGARetriever extends BaseRetriever {
    * @param checks - An array of `ClientCheckRequest` objects representing the permissions to be checked.
    * @returns A promise that resolves to a `Map` where the keys are object identifiers and the values are booleans indicating whether the permission is allowed.
    */
-  async checkPermissions(
+  private async checkPermissions(
     requests: ClientCheckRequest[]
   ): Promise<Map<string, boolean>> {
     const batchCheckResponse = await this.fgaClient.batchCheck(requests, {
