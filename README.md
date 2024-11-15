@@ -1,5 +1,8 @@
 # Auth0 AI for JavaScript
 
+> [!WARNING]
+> Auth0 AI is currently under development and it is not intended to be used in production, and therefore has no official support.
+
 [Auth0 AI](https://www.auth0.ai/) helps you build secure AI-powered applications
 that operate on behalf of a person.
 
