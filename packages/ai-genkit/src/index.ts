@@ -3,6 +3,7 @@
 
 export { GenkitAgent as Agent } from './agent'
 export { GenkitOrchestrator as Orchestrator } from './orchestrator'
+export { loop } from './loop'
 
 // references:
 // https://firebase.google.com/docs/genkit/auth
