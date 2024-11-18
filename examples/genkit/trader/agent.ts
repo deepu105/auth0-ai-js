@@ -1,29 +1,29 @@
+import 'dotenv/config'
 import { defineCommand, runMain } from 'citty';
 // NOTE: this throws errors that were fixed by commenting out unknown symbols
 // in node_modules/@genkit-ai/ai/lib/index.mjs
-import { generate, defineTool } from '@genkit-ai/ai';
-import { configureGenkit } from '@genkit-ai/core';
-import { openAI, gpt4o } from 'genkitx-openai';
+//import { generate, defineTool } from '@genkit-ai/ai';
+//import { configureGenkit } from '@genkit-ai/core';
+import { genkit } from 'genkit';
+import openAI, { gpt4o } from 'genkitx-openai';
+//import { openAI, gpt4o } from 'genkitx-openai';
 import * as z from 'zod';
-import { CIBAAuthorizer, FSStore } from '@auth0/ai';
-import { Orchestrator, Agent } from '@auth0/ai-genkit';
-import { loop, reenterLoop } from '@auth0/ai-genkit';
+import { interact, CIBAAuthorizer, FSStore, PollingCIBAAuthorizationReceiver, Auth0CIBAAuthorizer } from '@auth0/ai';
+import { loop, Orchestrator, Agent } from '@auth0/ai-genkit';
 import { buy } from './tools/buy';
 
-import 'dotenv/config'
+console.log('genkit...');
+console.log(openAI)
+console.log(gpt4o)
 
-configureGenkit({
-  plugins: [
-    openAI()
-  ],
-  // Log debug output to tbe console.
-  //logLevel: 'debug',
-  // Perform OpenTelemetry instrumentation and enable trace collection.
-  enableTracingAndMetrics: true,
+
+const ai = genkit({
+  plugins: [ openAI.openAI({ apiKey: process.env.OPENAI_API_KEY }) ],
+  model: gpt4o,
 });
 
 const buyToolInputSchema = z.object({ ticker: z.string(), qty: z.number() });
-const buyTool = defineTool(
+const buyTool = ai.defineTool(
   {
     name: "buy",
     description: "Use this function to buy stock",
@@ -32,6 +32,7 @@ const buyTool = defineTool(
   },
   buy
 );
+
 
 const main = defineCommand({
   meta: {
@@ -56,22 +57,86 @@ const main = defineCommand({
       description: "Thread to continue",
     },
   },
-  run({ args }) {
+  async run({ args }) {
+    console.log(args);
+    
     if (args.thread) {
-      resume(gpt4o, [ buyTool ], args.thread, args.token);
-      return;
+      //resume(gpt4o, [ buyTool ], args.thread, args.token);
+      //return;
     }
     
-    prompt(gpt4o, [ buyTool], args.message);
+    const authorizer = new Auth0CIBAAuthorizer({
+      domain: process.env['DOMAIN'],
+      clientID: process.env['CLIENT_ID'],
+      clientSecret: process.env['CLIENT_SECRET']
+    });
+    const receiver = new PollingCIBAAuthorizationReceiver('https://ai-117332.us.auth0.com/oauth/token');
+    
+    
+    const interactivePrompt = interact(prompt, authorizer, receiver);
+    const user = {
+      id: 'auth0|672d15e3a67830e930d6679b'
+    }
+    
+    let rv = await interactivePrompt({ user: user }, gpt4o, [ buyTool ], args.message);
+    //console.log(rv.candidates[0].message);
+    console.log(rv);
+    
+    //prompt(gpt4o, [ buyTool], args.message);
   },
 });
 
 runMain(main);
 
+
+/*
+configureGenkit({
+  plugins: [
+    openAI()
+  ],
+  // Log debug output to tbe console.
+  //logLevel: 'debug',
+  // Perform OpenTelemetry instrumentation and enable trace collection.
+  enableTracingAndMetrics: true,
+});
+*/
+
+
 async function prompt(model, tools, message) {
+  console.log('GenKit prompt');
+  console.log(message);
+  
+  
+  const { text } = await ai.generate({
+    //'Hello, I am a stock trader'
+    prompt: message,
+    tools: tools
+  });
+  console.log(text);
+  return text;
+  
+  
+  /*
+  let llmResponse = await loop(generate)({
+  //let llmResponse = await generate({
+    model: model,
+    prompt: message,
+    tools: tools
+  });
+  */
+  
+  //return llmResponse;
+  
+  /*
   const app = new Orchestrator();
   app.agent = new Agent(generate, model, tools)
-  app.authorizer = new CIBAAuthorizer("http://localhost:3000/oauth2/bc-authorize");
+  //app.authorizer = new CIBAAuthorizer("http://localhost:3000/oauth2/bc-authorize");
+  app.authorizer = new Auth0CIBAAuthorizer({
+    domain: process.env['DOMAIN'],
+    clientID: process.env['CLIENT_ID'],
+    clientSecret: process.env['CLIENT_SECRET']
+  });
+  app.receiver =  new PollingCIBAAuthorizationReceiver('https://ai-117332.us.auth0.com/oauth/token');
   app.historyStore = new FSStore(".");
   
   //const response = await app.prompt(message);
@@ -83,4 +148,5 @@ async function prompt(model, tools, message) {
   if (response) {
     console.log(response.message);
   }
+  */
 }
