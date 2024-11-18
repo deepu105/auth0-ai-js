@@ -23,19 +23,11 @@ const buyTool = ai.defineTool(
 
 
 export async function prompt(params) {
-  console.log('genkit prompt...');
-  console.log(params)
-  
-  
   const { text } = await ai.generate({
     //'Hello, I am a stock trader'
     prompt: params.message,
     tools: [ buyTool ]
   });
-  console.log(text);
-  //return text;
-  
-  
   
   return { message: {
     //content: 'OK'
