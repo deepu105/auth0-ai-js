@@ -1,10 +1,10 @@
+import 'dotenv/config'
 import { defineCommand, runMain } from 'citty';
 import { OpenAIAgent, FunctionTool } from "llamaindex";
-import { CIBAAuthorizer, FSStore } from '@auth0/ai';
+import { interact, Auth0CIBAAuthorizer, CIBAAuthorizer, PollingCIBAAuthorizationReceiver, FSStore } from '@auth0/ai';
 import { Orchestrator } from '@auth0/ai-llamaindex';
 import { buy } from './tools/buy';
 
-import 'dotenv/config'
 
 const main = defineCommand({
   meta: {
@@ -19,22 +19,65 @@ const main = defineCommand({
       required: false,
     }
   },
-  run({ args }) {
-    const agent = new OpenAIAgent({
-      tools: [ buyTool ],
-      verbose: true
+  async run({ args }) {
+    const authorizer = new Auth0CIBAAuthorizer({
+      domain: process.env['DOMAIN'],
+      clientID: process.env['CLIENT_ID'],
+      clientSecret: process.env['CLIENT_SECRET']
     });
+    const receiver = new PollingCIBAAuthorizationReceiver('https://ai-117332.us.auth0.com/oauth/token');
     
-    prompt(agent, args.message);
+    
+    const interactivePrompt = interact(prompt, authorizer, receiver);
+    const user = {
+      id: 'auth0|672d15e3a67830e930d6679b'
+    }
+    
+    let rv = await interactivePrompt({ user: user }, args.message);
+    console.log(rv.message);
   },
 });
 
 runMain(main);
 
-async function prompt(agent, message) {
+async function prompt(message) {
+  const buyTool = FunctionTool.from(buy,
+    {
+      name: "buy",
+      description: "Use this function to buy stock",
+      parameters: {
+        type: "object",
+        properties: {
+          ticker: {
+            type: "string",
+            description: "The ticker symbol",
+          },
+          qty: {
+            type: "number",
+            description: "The quantity",
+          },
+        },
+        required: ["ticker", "qty"],
+      },
+    },
+  );
+
+  const agent = new OpenAIAgent({
+    tools: [ buyTool ],
+    verbose: true
+  });
+  
+  return await agent.chat({ message: message });
+  
+  /*
   const app = new Orchestrator();
   app.agent = agent;
-  app.authorizer = new CIBAAuthorizer("http://localhost:3000/oauth2/bc-authorize");
+  app.authorizer = new Auth0CIBAAuthorizer({
+    domain: 'ai-117332.us.auth0.com',
+    clientID: process.env['CLIENT_ID'],
+    clientSecret: process.env['CLIENT_SECRET']
+  });
+  app.receiver = new PollingCIBAAuthorizationReceiver('https://ai-117332.us.auth0.com/oauth/token');
   app.historyStore = new FSStore(".");
   
   
@@ -42,27 +85,6 @@ async function prompt(agent, message) {
   if (response) {
     console.log(response.message);
   }
+  */
 }
-
-
-const buyTool = FunctionTool.from(buy,
-  {
-    name: "buy",
-    description: "Use this function to buy stock",
-    parameters: {
-      type: "object",
-      properties: {
-        ticker: {
-          type: "string",
-          description: "The ticker symbol",
-        },
-        qty: {
-          type: "number",
-          description: "The quantity",
-        },
-      },
-      required: ["ticker", "qty"],
-    },
-  },
-);
 

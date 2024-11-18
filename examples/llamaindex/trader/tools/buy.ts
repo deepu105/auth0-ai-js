@@ -8,7 +8,7 @@ export let buy = function({ ticker, qty }) {
   
   const accessToken = tokens().accessToken;
   if (!accessToken) {
-    throw new AuthorizationError('You need authorization to buy stock', 'insufficient_scope', { scope: [ 'stock.buy' ] });
+    throw new AuthorizationError('You need authorization to buy stock', 'insufficient_scope', { scope: [ 'openid', 'stock.buy' ] });
   }
   
   return 'OK'
