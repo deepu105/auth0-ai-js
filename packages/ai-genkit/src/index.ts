@@ -3,7 +3,7 @@
 
 export { GenkitAgent as Agent } from './agent'
 export { GenkitOrchestrator as Orchestrator } from './orchestrator'
-export { loop } from './loop'
+export { FGARetriever, auth0 } from "./retrievers/fga-retriever";
 
 // references:
 // https://firebase.google.com/docs/genkit/auth

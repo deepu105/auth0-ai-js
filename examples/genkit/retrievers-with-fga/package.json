@@ -1,0 +1,27 @@
+{
+  "name": "genkit-retrievers-with-fga",
+  "version": "0.0.0",
+  "description": "Demonstrates the usage of the OKTA FGA with a genkit to query documents with permission checks.",
+  "x-type": "module",
+  "main": "index.js",
+  "author": {
+    "name": "Auth0 Inc.",
+    "url": "https://auth0.com"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "generate": "npx tsx ./helpers/create-indexer.ts",
+    "dev": "npx tsx index.ts",
+    "fga:init": "npx tsx ./scripts/fga-init.ts"
+  },
+  "dependencies": {
+    "@auth0/ai-genkit": "*",
+    "@genkit-ai/ai": "^0.5.17",
+    "@genkit-ai/core": "^0.5.17",
+    "@genkit-ai/dev-local-vectorstore": "^0.5.17",
+    "@genkit-ai/flow": "^0.5.17",
+    "genkitx-openai": "^0.10.1",
+    "dotenv": "^16.4.5",
+    "@openfga/sdk": "^0.7.0"
+  }
+}

@@ -44,7 +44,7 @@ export class FGARetriever<T extends ClientCheckRequest> extends BaseRetriever {
     ) => Promise<Map<string, boolean>>;
   }
 
-  static adaptFGA(
+  static create(
     args: FGARetrieverArgsWithoutCheckFromDocument<ClientCheckRequest>,
     fgaClient?: OpenFgaClient
   ): FGARetriever<ClientCheckRequest> {

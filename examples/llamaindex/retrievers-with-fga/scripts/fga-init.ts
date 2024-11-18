@@ -54,7 +54,9 @@ async function main() {
   // 02. CONFIGURE PRE-DEFINED TUPLES
   await fgaClient.write(
     {
-      writes: [{ user: "user:*", relation: "viewer", object: "doc:doc1" }],
+      writes: [
+        { user: "user:*", relation: "viewer", object: "doc:public-doc" },
+      ],
     },
     {
       authorizationModelId: model.authorization_model_id,
