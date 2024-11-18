@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import { defineCommand, runMain } from 'citty';
-import { interact, Auth0CIBAAuthorizer, CIBAAuthorizer, PollingCIBAAuthorizationReceiver, FSStore } from '@auth0/ai';
+import { interact, Auth0CIBAAuthorizer, PollingCIBAAuthorizationReceiver } from '@auth0/ai';
 import { prompt } from '../agent-llamaindex';
 // -- OR --
 //import { prompt } from '../agent-genkit';
@@ -21,10 +21,6 @@ const main = defineCommand({
     }
   },
   async run({ args }) {
-    console.log('AGENT');
-    console.log(args)
-    
-    
     const authorizer = new Auth0CIBAAuthorizer({
       domain: process.env['DOMAIN'],
       clientID: process.env['CLIENT_ID'],
