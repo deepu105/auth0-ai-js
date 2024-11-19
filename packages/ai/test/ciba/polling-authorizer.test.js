@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { CIBAAuthorizer } from '../../src/ciba/polling-authorizer'
+import { PollingCIBAAuthorizer } from '../../src/ciba/polling-authorizer'
 
-describe('CIBAAuthorizer#authorize', () => {
+describe('PollingCIBAAuthorizer#authorize', () => {
   
   describe('constructor', async () => {
     
     it('should construct with client secret', () => {
-      const authorizer = new CIBAAuthorizer({ url: 'http://example.test/bc-authorize', clientID: 's6BhdRkqt3', clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw' })
-      expect(authorizer.url).toBe('http://example.test/bc-authorize')
+      const authorizer = new PollingCIBAAuthorizer({ url: 'http://example.test/bc-authorize', clientID: 's6BhdRkqt3', clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw' })
+      expect(authorizer.authorizationURL).toBe('http://example.test/bc-authorize')
       expect(authorizer.clientID).toBe('s6BhdRkqt3')
       expect(authorizer.clientSecret).toBe('7Fjfp0ZBr1KtDRbnfVdmIw')
     })
@@ -26,7 +26,7 @@ describe('CIBAAuthorizer#authorize', () => {
         })
       }))
     
-      const authorizer = new CIBAAuthorizer('http://example.test/bc-authorize')
+      const authorizer = new PollingCIBAAuthorizer('http://example.test/bc-authorize')
       const x = await authorizer.authorize({ loginHint: 'janedoe@example.com', scope: [ 'openid' ] })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
         method: 'POST',
@@ -48,7 +48,7 @@ describe('CIBAAuthorizer#authorize', () => {
         })
       }))
     
-      const authorizer = new CIBAAuthorizer('http://example.test/bc-authorize')
+      const authorizer = new PollingCIBAAuthorizer('http://example.test/bc-authorize')
       const x = await authorizer.authorize({ loginHint: 'janedoe@example.com', scope: [ 'openid' ], acrValues: [ 'myACR' ] })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
         method: 'POST',
@@ -70,7 +70,7 @@ describe('CIBAAuthorizer#authorize', () => {
         })
       }))
     
-      const authorizer = new CIBAAuthorizer('http://example.test/bc-authorize')
+      const authorizer = new PollingCIBAAuthorizer('http://example.test/bc-authorize')
       const x = await authorizer.authorize({ loginHint: 'janedoe@example.com', scope: [ 'openid' ], bindingMessage: 'W4SCT' })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
         method: 'POST',
@@ -92,7 +92,7 @@ describe('CIBAAuthorizer#authorize', () => {
         })
       }))
     
-      const authorizer = new CIBAAuthorizer('http://example.test/bc-authorize')
+      const authorizer = new PollingCIBAAuthorizer('http://example.test/bc-authorize')
       const x = await authorizer.authorize({ scope: [ 'urn:example:channel=HBO', 'urn:example:rating=G,PG-13' ] })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
         method: 'POST',
@@ -114,7 +114,7 @@ describe('CIBAAuthorizer#authorize', () => {
         })
       }))
     
-      const authorizer = new CIBAAuthorizer({ url: 'http://example.test/bc-authorize', clientID: 's6BhdRkqt3', clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw' })
+      const authorizer = new PollingCIBAAuthorizer({ url: 'http://example.test/bc-authorize', clientID: 's6BhdRkqt3', clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw' })
       const x = await authorizer.authorize({ scope: [ 'openid' ], acrValues: [ 'myACR' ] })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
         method: 'POST',

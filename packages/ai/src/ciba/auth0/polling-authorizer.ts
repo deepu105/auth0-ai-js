@@ -9,7 +9,7 @@ interface Auth0CIBAAuthorizerOptions extends CIBAAuthorizerOptions {
  * Requests authorization by prompting the user via an out-of-band channel from
  * the backend.
  */
-export class Auth0CIBAAuthorizer extends PollingCIBAAuthorizer {
+export class Auth0PollingCIBAAuthorizer extends PollingCIBAAuthorizer {
   
   constructor(options: string | Auth0CIBAAuthorizerOptions) {
     if (typeof options === 'string') {
