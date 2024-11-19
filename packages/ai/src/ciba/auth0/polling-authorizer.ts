@@ -11,19 +11,12 @@ interface Auth0CIBAAuthorizerOptions extends CIBAAuthorizerOptions {
  */
 export class Auth0PollingCIBAAuthorizer extends PollingCIBAAuthorizer {
   
-  constructor(options: string | Auth0CIBAAuthorizerOptions) {
-    if (typeof options === 'string') {
-      if (URL.canParse(options)) {
-        super(options)
-      } else {
-        super('https://' + options + '/bc-authorize')
-      }
-    } else {
-      if (options.domain) {
-        options.url = 'https://' + options.domain + '/bc-authorize'
-      }
-      super(options)
+  constructor(options: Auth0CIBAAuthorizerOptions) {
+    if (options.domain) {
+      options.authorizationURL = 'https://' + options.domain + '/bc-authorize'
+      options.tokenURL = 'https://' + options.domain + '/oauth/token'
     }
+    super(options)
   }
   
   async authorize(params: AuthorizationOptions) {

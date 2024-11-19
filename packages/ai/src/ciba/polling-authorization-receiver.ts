@@ -9,7 +9,7 @@ export class PollingCIBAAuthorizationReceiver {
     if (typeof options === 'string') {
       this.url = options;
     } else {
-      this.url = options.url;
+      this.url = options.authorizationURL;
       this.clientID = options.clientID;
       this.clientSecret = options.clientSecret;
     }

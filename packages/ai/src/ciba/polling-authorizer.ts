@@ -2,7 +2,8 @@ import { Authorizer } from '../authorizer'
 import { AuthorizationError, AuthorizationOptions } from '../errors/authorizationerror'
 
 export interface CIBAAuthorizerOptions {
-  url: string;
+  authorizationURL: string;
+  tokenURL: string;
   clientID?: string;
   clientSecret?: string;
 }
@@ -18,14 +19,11 @@ export class PollingCIBAAuthorizer implements Authorizer {
   clientID
   clientSecret
   
-  constructor(options: string | CIBAAuthorizerOptions) {
-    if (typeof options === 'string') {
-      this.authorizationURL = options;
-    } else {
-      this.authorizationURL = options.url;
-      this.clientID = options.clientID;
-      this.clientSecret = options.clientSecret;
-    }
+  constructor(options: CIBAAuthorizerOptions) {
+    this.authorizationURL = options.authorizationURL;
+    this.tokenURL = options.tokenURL;
+    this.clientID = options.clientID;
+    this.clientSecret = options.clientSecret;
   }
   
   async authorize(params: AuthorizationOptions) {
