@@ -24,6 +24,7 @@ export class AuthorizationError extends Error {
   maxAge: number
   scope: string[]
   realm: string
+  sessionId: string
   
   constructor(message: string, code: string, params: AuthorizationErrorOptions) {
     super(message);
