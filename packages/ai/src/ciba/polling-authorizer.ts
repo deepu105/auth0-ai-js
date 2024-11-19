@@ -4,7 +4,7 @@ import { AuthorizationError, AuthorizationOptions } from '../errors/authorizatio
 export interface CIBAAuthorizerOptions {
   authorizationURL: string;
   tokenURL: string;
-  clientID?: string;
+  clientId?: string;
   clientSecret?: string;
 }
 
@@ -16,13 +16,13 @@ export interface CIBAAuthorizerOptions {
 export class PollingCIBAAuthorizer implements Authorizer {
   authorizationURL
   tokenURL
-  clientID
+  clientId
   clientSecret
   
   constructor(options: CIBAAuthorizerOptions) {
     this.authorizationURL = options.authorizationURL;
     this.tokenURL = options.tokenURL;
-    this.clientID = options.clientID;
+    this.clientId = options.clientId;
     this.clientSecret = options.clientSecret;
   }
   
@@ -35,8 +35,8 @@ export class PollingCIBAAuthorizer implements Authorizer {
       binding_message?: string
     } = {}
     
-    if (this.clientID && this.clientSecret) {
-      headers['Authorization'] = 'Basic ' + Buffer.from([ this.clientID, this.clientSecret ].join(':')).toString('base64')
+    if (this.clientId && this.clientSecret) {
+      headers['Authorization'] = 'Basic ' + Buffer.from([ this.clientId, this.clientSecret ].join(':')).toString('base64')
     }
     
     if (params.loginHint) { body.login_hint = params.loginHint }

@@ -10,7 +10,7 @@ export class PollingCIBAAuthorizationReceiver {
       this.url = options;
     } else {
       this.url = options.authorizationURL;
-      this.clientID = options.clientID;
+      this.clientID = options.clientId;
       this.clientSecret = options.clientSecret;
     }
   }

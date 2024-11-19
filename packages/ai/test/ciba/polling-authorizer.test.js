@@ -6,13 +6,17 @@ describe('PollingCIBAAuthorizer#authorize', () => {
   describe('constructor', async () => {
     
     it('should construct with client secret', () => {
-      const authorizer = new PollingCIBAAuthorizer({ url: 'http://example.test/bc-authorize', clientID: 's6BhdRkqt3', clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw' })
+      const authorizer = new PollingCIBAAuthorizer({
+        authorizationURL: 'http://example.test/bc-authorize',
+        clientId: 's6BhdRkqt3',
+        clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw'
+      })
       expect(authorizer.authorizationURL).toBe('http://example.test/bc-authorize')
-      expect(authorizer.clientID).toBe('s6BhdRkqt3')
+      expect(authorizer.clientId).toBe('s6BhdRkqt3')
       expect(authorizer.clientSecret).toBe('7Fjfp0ZBr1KtDRbnfVdmIw')
-    })
+    }) // should construct with client secret
     
-  })
+  }) // constructor
   
   describe('#authorize', async () => {
     
@@ -26,7 +30,9 @@ describe('PollingCIBAAuthorizer#authorize', () => {
         })
       }))
     
-      const authorizer = new PollingCIBAAuthorizer('http://example.test/bc-authorize')
+      const authorizer = new PollingCIBAAuthorizer({
+        authorizationURL: 'http://example.test/bc-authorize'
+      })
       const x = await authorizer.authorize({ loginHint: 'janedoe@example.com', scope: [ 'openid' ] })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
         method: 'POST',
@@ -48,7 +54,9 @@ describe('PollingCIBAAuthorizer#authorize', () => {
         })
       }))
     
-      const authorizer = new PollingCIBAAuthorizer('http://example.test/bc-authorize')
+      const authorizer = new PollingCIBAAuthorizer({
+        authorizationURL: 'http://example.test/bc-authorize'
+      })
       const x = await authorizer.authorize({ loginHint: 'janedoe@example.com', scope: [ 'openid' ], acrValues: [ 'myACR' ] })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
         method: 'POST',
@@ -70,7 +78,9 @@ describe('PollingCIBAAuthorizer#authorize', () => {
         })
       }))
     
-      const authorizer = new PollingCIBAAuthorizer('http://example.test/bc-authorize')
+      const authorizer = new PollingCIBAAuthorizer({
+        authorizationURL: 'http://example.test/bc-authorize'
+      })
       const x = await authorizer.authorize({ loginHint: 'janedoe@example.com', scope: [ 'openid' ], bindingMessage: 'W4SCT' })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
         method: 'POST',
@@ -92,7 +102,9 @@ describe('PollingCIBAAuthorizer#authorize', () => {
         })
       }))
     
-      const authorizer = new PollingCIBAAuthorizer('http://example.test/bc-authorize')
+      const authorizer = new PollingCIBAAuthorizer({
+        authorizationURL: 'http://example.test/bc-authorize'
+      })
       const x = await authorizer.authorize({ scope: [ 'urn:example:channel=HBO', 'urn:example:rating=G,PG-13' ] })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
         method: 'POST',
@@ -114,15 +126,19 @@ describe('PollingCIBAAuthorizer#authorize', () => {
         })
       }))
     
-      const authorizer = new PollingCIBAAuthorizer({ url: 'http://example.test/bc-authorize', clientID: 's6BhdRkqt3', clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw' })
-      const x = await authorizer.authorize({ scope: [ 'openid' ], acrValues: [ 'myACR' ] })
+      const authorizer = new PollingCIBAAuthorizer({
+        authorizationURL: 'http://example.test/bc-authorize',
+        clientId: 's6BhdRkqt3',
+        clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw'
+      })
+      const x = await authorizer.authorize({ loginHint: 'janedoe@example.com', scope: [ 'openid' ] })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
         method: 'POST',
         headers: {
           'Authorization': 'Basic czZCaGRSa3F0Mzo3RmpmcDBaQnIxS3REUmJuZlZkbUl3',
           'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: 'acr_values=myACR&scope=openid'
+        body: 'login_hint=janedoe%40example.com&scope=openid'
       });
       expect(x).toEqual('1c266114-a1be-4252-8ad1-04986c5b9ac1')
     }) // should authenticate using HTTP basic scheme
