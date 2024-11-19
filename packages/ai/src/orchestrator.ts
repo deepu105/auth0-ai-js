@@ -3,8 +3,6 @@ import { Authorizer, Receiver } from './authorizer';
 import { Store } from './history/store';
 import { agentAsyncStorage } from './async-storage';
 
-import type { CIBAAuthorizer } from "./ciba-authorizer";
-
 export class Orchestrator {
   agent
   authorizer: Authorizer

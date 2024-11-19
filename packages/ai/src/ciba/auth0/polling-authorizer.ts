@@ -1,4 +1,4 @@
-import { CIBAAuthorizer, CIBAAuthorizerOptions } from '../polling-authorizer'
+import { PollingCIBAAuthorizer, CIBAAuthorizerOptions } from '../polling-authorizer'
 import { AuthorizationError, AuthorizationOptions } from '../../errors/authorizationerror'
 
 interface Auth0CIBAAuthorizerOptions extends CIBAAuthorizerOptions {
@@ -9,7 +9,7 @@ interface Auth0CIBAAuthorizerOptions extends CIBAAuthorizerOptions {
  * Requests authorization by prompting the user via an out-of-band channel from
  * the backend.
  */
-export class Auth0CIBAAuthorizer extends CIBAAuthorizer {
+export class Auth0CIBAAuthorizer extends PollingCIBAAuthorizer {
   
   constructor(options: string | Auth0CIBAAuthorizerOptions) {
     if (typeof options === 'string') {
@@ -27,7 +27,7 @@ export class Auth0CIBAAuthorizer extends CIBAAuthorizer {
   }
   
   async authorize(params: AuthorizationOptions) {
-    const url = new URL(this.url);
+    const url = new URL(this.authorizationURL);
     url.pathname = '/';
      
     // Auth0 wants a JSON object, as recommended by FAPI...

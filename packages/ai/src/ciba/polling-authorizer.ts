@@ -12,16 +12,17 @@ export interface CIBAAuthorizerOptions {
  * Requests authorization by prompting the user via an out-of-band channel from
  * the backend.
  */
-export class CIBAAuthorizer implements Authorizer {
-  url
+export class PollingCIBAAuthorizer implements Authorizer {
+  authorizationURL
+  tokenURL
   clientID
   clientSecret
   
   constructor(options: string | CIBAAuthorizerOptions) {
     if (typeof options === 'string') {
-      this.url = options;
+      this.authorizationURL = options;
     } else {
-      this.url = options.url;
+      this.authorizationURL = options.url;
       this.clientID = options.clientID;
       this.clientSecret = options.clientSecret;
     }
@@ -52,7 +53,7 @@ export class CIBAAuthorizer implements Authorizer {
     // TODO: client authentication
     
     headers['Content-Type'] = 'application/x-www-form-urlencoded'
-    const response = await fetch(this.url, {
+    const response = await fetch(this.authorizationURL, {
       method: 'POST',
       headers: headers,
       body: new URLSearchParams(body).toString(),
