@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { Auth0CIBAAuthorizer } from '../../../src/ciba/auth0/polling-authorizer'
+import { Auth0PollingCIBAAuthorizer } from '../../../src/ciba/auth0/polling-authorizer'
 
-describe('Auth0CIBAAuthorizer#authorize', () => {
+describe('Auth0PollingCIBAAuthorizer#authorize', () => {
   
   it('should send request to url', async () => {
     vi.stubGlobal('fetch', vi.fn(() => {
@@ -13,7 +13,7 @@ describe('Auth0CIBAAuthorizer#authorize', () => {
       })
     }))
     
-    const authorizer = new Auth0CIBAAuthorizer('https://example.auth0.com/bc-authorize')
+    const authorizer = new Auth0PollingCIBAAuthorizer('https://example.auth0.com/bc-authorize')
     
     const x = await authorizer.authorize({ acrValues: [ 'myACR' ], scope: [ 'purchase' ] })
     expect(fetch).toHaveBeenCalledWith('https://example.auth0.com/bc-authorize', {
@@ -36,7 +36,7 @@ describe('Auth0CIBAAuthorizer#authorize', () => {
       })
     }))
     
-    const authorizer = new Auth0CIBAAuthorizer('example.auth0.com')
+    const authorizer = new Auth0PollingCIBAAuthorizer('example.auth0.com')
     
     const x = await authorizer.authorize({ acrValues: [ 'myACR' ], scope: [ 'purchase' ] })
     expect(fetch).toHaveBeenCalledWith('https://example.auth0.com/bc-authorize', {
@@ -59,7 +59,7 @@ describe('Auth0CIBAAuthorizer#authorize', () => {
       })
     }))
     
-    const authorizer = new Auth0CIBAAuthorizer({ url: 'https://example.auth0.com/bc-authorize',  clientID: 's6BhdRkqt3', clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw' })
+    const authorizer = new Auth0PollingCIBAAuthorizer({ url: 'https://example.auth0.com/bc-authorize',  clientID: 's6BhdRkqt3', clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw' })
     
     const x = await authorizer.authorize({ acrValues: [ 'myACR' ], scope: [ 'purchase' ] })
     expect(fetch).toHaveBeenCalledWith('https://example.auth0.com/bc-authorize', {
@@ -83,7 +83,7 @@ describe('Auth0CIBAAuthorizer#authorize', () => {
       })
     }))
     
-    const authorizer = new Auth0CIBAAuthorizer({ domain: 'example.auth0.com',  clientID: 's6BhdRkqt3', clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw' })
+    const authorizer = new Auth0PollingCIBAAuthorizer({ domain: 'example.auth0.com',  clientID: 's6BhdRkqt3', clientSecret: '7Fjfp0ZBr1KtDRbnfVdmIw' })
     
     const x = await authorizer.authorize({ acrValues: [ 'myACR' ], scope: [ 'purchase' ] })
     expect(fetch).toHaveBeenCalledWith('https://example.auth0.com/bc-authorize', {
