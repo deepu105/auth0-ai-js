@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { CIBAAuthorizer } from '../src/ciba-authorizer'
+import { CIBAAuthorizer } from '../../src/ciba/polling-authorizer'
 
 describe('CIBAAuthorizer#authorize', () => {
   

@@ -1,4 +1,4 @@
-import { CIBAAuthorizerOptions } from '../ciba-authorizer'
+import { CIBAAuthorizerOptions } from './polling-authorizer'
 
 export class PollingCIBAAuthorizationReceiver {
   url

@@ -1,5 +1,5 @@
-import { CIBAAuthorizer, CIBAAuthorizerOptions } from './ciba-authorizer'
-import { AuthorizationError, AuthorizationOptions } from './errors/authorizationerror'
+import { CIBAAuthorizer, CIBAAuthorizerOptions } from '../polling-authorizer'
+import { AuthorizationError, AuthorizationOptions } from '../../errors/authorizationerror'
 
 interface Auth0CIBAAuthorizerOptions extends CIBAAuthorizerOptions {
   domain?: string;
