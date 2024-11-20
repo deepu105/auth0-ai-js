@@ -14,7 +14,10 @@ const buy = ai.defineTool(
   {
     name: "buy",
     description: "Use this function to buy stock",
-    inputSchema: z.object({ ticker: z.string(), qty: z.number() }),
+    inputSchema: z.object({
+      ticker: z.string(),
+      qty: z.number()
+    }),
     outputSchema: z.string(),
   },
   async ({ ticker, qty }) => {
