@@ -1,46 +1,45 @@
-import { genkit } from 'genkit';
-import * as z from 'zod';
-import openAI, { gpt4o } from 'genkitx-openai';
-import { FSSessionStore } from '@auth0/ai-genkit';
-import { buy } from './tools/buy.js';
+import { genkit, z } from 'genkit';
+import { openAI, gpt4o } from 'genkitx-openai';
 import { AuthorizationError } from '@auth0/ai';
+import { FSSessionStore } from '@auth0/ai-genkit';
+import { tokens } from '@auth0/ai/tokens';
 
 
 const ai = genkit({
-  plugins: [ openAI.openAI({ apiKey: process.env.OPENAI_API_KEY }) ],
+  plugins: [ openAI({ apiKey: process.env.OPENAI_API_KEY }) ],
   model: gpt4o,
 });
 
-const buyToolInputSchema = z.object({ ticker: z.string(), qty: z.number() });
-const buyTool = ai.defineTool(
+const buy = ai.defineTool(
   {
     name: "buy",
     description: "Use this function to buy stock",
-    inputSchema: buyToolInputSchema,
+    inputSchema: z.object({ ticker: z.string(), qty: z.number() }),
     outputSchema: z.string(),
   },
-  buy
+  async ({ ticker, qty }) => {
+    const accessToken = tokens().accessToken;
+    if (!accessToken) {
+      throw new AuthorizationError('You need authorization to buy stock', 'insufficient_scope', { scope: [ 'openid', 'stock.buy' ] });
+    }
+  
+    return 'OK'
+  }
 );
-
 
 
 export async function prompt(params) {
   const session = ai.createSession({
     store: new FSSessionStore(),
-  })
-  console.log('created session: ' + session.id);
-  
+  });
   const chat = session.chat();
-  console.log(chat.session);
-  console.log(chat.sessionId);
-  console.log(chat.session.store);
   
   
   try {
     const { text } = await chat.send({
       //'Hello, I am a stock trader'
       prompt: params.message,
-      tools: [ buyTool ]
+      tools: [ buy ]
     });
   
     return { message: {
@@ -48,12 +47,7 @@ export async function prompt(params) {
       context: text
     } };
   } catch (error) {
-    console.log('CAUGHT ERROR IN GENKIT');
-    console.log(error)
-    
     if (error instanceof AuthorizationError) {
-      console.log('AUTHORIZATION ERROR, SAVE THE SESSION');
-      
       // TODO: I wish there was a better interface here to explicitly persist
       // the session.  It may also be worth considering wether to inject a
       // system method saying that authorization was requested, in which case
