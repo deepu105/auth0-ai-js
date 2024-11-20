@@ -59,6 +59,46 @@ export class PollingCIBAAuthorizer implements Authorizer {
     });
     
     var json = await response.json();
-    return json.auth_req_id;
+    //return json.auth_req_id;
+    
+    return await this.poll(json.auth_req_id)
+  }
+  
+  async poll(reqId: string) {
+    return new Promise((resolve, reject) => {
+      const interval = setInterval(async () => {
+        var headers = {};
+        const body = {
+          grant_type: 'urn:openid:params:grant-type:ciba',
+          auth_req_id: reqId,
+          client_id: this.clientId
+        }
+        
+        
+        if (this.clientId && this.clientSecret) {
+          headers['Authorization'] = 'Basic ' + Buffer.from([ this.clientId, this.clientSecret ].join(':')).toString('base64')
+        }
+        
+        headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        const response = await fetch(this.tokenURL, {
+          method: 'POST',
+          headers: headers,
+          body: new URLSearchParams(body).toString(),
+          // ...
+        });
+        
+        var json = await response.json();
+        if (json.error == 'authorization_pending') { return; }
+        if (json.error == 'access_denied') {
+          clearInterval(interval);
+          // TODO: reject with error
+          return;
+        }
+  
+        const token = json.access_token;
+        clearInterval(interval);
+        return resolve(token);
+      }, 1000);
+    });
   }
 }

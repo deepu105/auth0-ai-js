@@ -37,11 +37,20 @@ export function interact(fn, authorizer, receiver) {
           params.scope = error.scope;
           params.realm = error.realm;
           
-          var transactionID = await authorizer.authorize(params, error.sessionId);
-          var token = await receiver.receive(transactionID);
+          var token = await authorizer.authorize(params, error.sessionId);
+          
+          console.log('AUTHORIZED!');
+          console.log(token)
+          
+          
+          // WIP: polling in the authorizer...
+          //var token = await receiver.receive(transactionID);
           ctx.tokens = {
             accessToken: token
           };
+          
+          //return;
+          
           return ifn.apply(undefined, arguments);
         }
         
