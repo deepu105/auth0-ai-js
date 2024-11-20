@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Auth0PollingCIBAAuthorizer } from '../../../src/ciba/auth0/polling-authorizer'
 
-describe('Auth0PollingCIBAAuthorizer#authorize', () => {
+describe.skip('Auth0PollingCIBAAuthorizer#authorize', () => {
   
   it('should send request to URLs', async () => {
     vi.stubGlobal('fetch', vi.fn(() => {

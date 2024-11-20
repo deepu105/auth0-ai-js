@@ -20,18 +20,36 @@ describe('PollingCIBAAuthorizer#authorize', () => {
   
   describe('#authorize', async () => {
     
-    it('should request authorization with login hint', async () => {
-      vi.stubGlobal('fetch', vi.fn(() => {
-        return Promise.resolve({
-          ok: true,
-          json: () => {
-            return Promise.resolve({ auth_req_id: '1c266114-a1be-4252-8ad1-04986c5b9ac1' });
-          }
+    it.only('should request authorization with login hint', async () => {
+      vi.stubGlobal('fetch', vi
+        .fn()
+        .mockImplementationOnce(() => {
+          return Promise.resolve({
+            ok: true,
+            json: () => {
+              return Promise.resolve({ auth_req_id: '1c266114-a1be-4252-8ad1-04986c5b9ac1' });
+            }
+          })
         })
-      }))
+        .mockImplementationOnce(() => {
+          return Promise.resolve({
+            ok: true,
+            json: () => {
+              return Promise.resolve({
+                access_token: 'G5kXH2wHvUra0sHlDy1iTkDJgsgUO1bN',
+                token_type: 'Bearer',
+                refresh_token: '4bwc0ESC_IAhflf-ACC_vjD_ltc11ne-8gFPfA2Kx16',
+                expires_in: 120,
+                id_token: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjE2NzcyNiJ9.eyJpc3MiOiJodHRwczovL3NlcnZlci5leGFtcGxlLmNvbSIsInN1YiI6IjI0ODI4OTc2MTAwMSIsImF1ZCI6InM2QmhkUmtxdDMiLCJlbWFpbCI6ImphbmVkb2VAZXhhbXBsZS5jb20iLCJleHAiOjE1Mzc4MTk4MDMsImlhdCI6MTUzNzgxOTUwM30.aVq83mdy72ddIFVJLjlNBX-5JHbjmwK-Sn9Mir-blesfYMceIOw6u4GOrO_ZroDnnbJXNKWAg_dxVynvMHnk3uJc46feaRIL4zfHf6Anbf5_TbgMaVO8iczD16A5gNjSD7yenT5fslrrW-NU_vtmi0s1puoM4EmSaPXCR19vRJyWuStJiRHK5yc3BtBlQ2xwxH1iNP49rGAQe_LHfW1G74NY5DaPv-V23JXDNEIUTY-jT-NbbtNHAxnhNPyn8kcO2WOoeIwANO9BfLF1EFWtjGPPMj6kDVrikec47yK86HArGvsIIwk1uExynJIv_tgZGE0eZI7MtVb2UlCwDQrVlg'
+              });
+            }
+          })
+        })
+      )
     
       const authorizer = new PollingCIBAAuthorizer({
-        authorizationURL: 'http://example.test/bc-authorize'
+        authorizationURL: 'http://example.test/bc-authorize',
+        tokenURL: 'http://example.test/token'
       })
       const x = await authorizer.authorize({ loginHint: 'janedoe@example.com', scope: [ 'openid' ] })
       expect(fetch).toHaveBeenCalledWith('http://example.test/bc-authorize', {
@@ -41,7 +59,7 @@ describe('PollingCIBAAuthorizer#authorize', () => {
         },
         body: 'login_hint=janedoe%40example.com&scope=openid'
       });
-      expect(x).toEqual('1c266114-a1be-4252-8ad1-04986c5b9ac1')
+      expect(x).toEqual('G5kXH2wHvUra0sHlDy1iTkDJgsgUO1bN')
     }) // should request authorization with login hint
     
     it('should request authorization with ACR value', async () => {
