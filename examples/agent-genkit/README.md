@@ -19,5 +19,5 @@ authorization server.  Once access has been granted, a fresh set of tokens are
 issued to the agent.  The framework then retries the previously denied request
 using the new credentials, which should allow it to proceed.
 
-Using [`@auth0/ai`], this agent can be hosted in a variety of different
+Using `@auth0/ai`, this agent can be hosted in a variety of different
 modalities, including ...
