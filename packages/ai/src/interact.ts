@@ -1,7 +1,7 @@
 import { agentAsyncStorage } from './async-storage';
 import { AuthorizationOptions, AuthorizationError } from './errors/authorizationerror';
 
-export function interact(fn, authorizer, receiver) {
+export function interact(fn, authorizer) {
   
   const ifn = async function(ctx, ...args) {
     return agentAsyncStorage.run(ctx, async () => {
@@ -38,18 +38,9 @@ export function interact(fn, authorizer, receiver) {
           params.realm = error.realm;
           
           var token = await authorizer.authorize(params, error.sessionId);
-          
-          console.log('AUTHORIZED!');
-          console.log(token)
-          
-          
-          // WIP: polling in the authorizer...
-          //var token = await receiver.receive(transactionID);
           ctx.tokens = {
             accessToken: token
           };
-          
-          //return;
           
           return ifn.apply(undefined, arguments);
         }
