@@ -38,10 +38,15 @@ export function interact(fn, authorizer) {
           params.realm = error.realm;
           
           var token = await authorizer.authorize(params, error.sessionId);
+          // FIXME: preserve the passed in context better here.
+          ctx.session = ctx.session || {};
+          ctx.session.id = error.sessionId;
           ctx.tokens = {
             accessToken: token
           };
           
+          
+          // WIP: how to apply session id here
           return ifn.apply(undefined, arguments);
         }
         

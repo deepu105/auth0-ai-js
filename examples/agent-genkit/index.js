@@ -2,6 +2,7 @@ import { genkit, z } from 'genkit';
 import { openAI, gpt4o } from 'genkitx-openai';
 import { AuthorizationError } from '@auth0/ai';
 import { FSSessionStore } from '@auth0/ai-genkit';
+import { session as sess } from '@auth0/ai/session';
 import { tokens } from '@auth0/ai/tokens';
 
 
@@ -31,17 +32,35 @@ const buy = ai.defineTool(
 );
 
 
-export async function prompt(params) {
-  const session = ai.createSession({
-    store: new FSSessionStore(),
-  });
-  const chat = session.chat();
+export async function prompt(message) {
+  console.log('## PROMPT ###');
+  console.log(sess());
+  console.log(tokens());
   
+  const sessionId = sess().id;
+  let session;
+  if (!sessionId) {
+    console.log('create session!');
+    session = ai.createSession({
+      store: new FSSessionStore(),
+    });
+  } else {
+    console.log('load session! ' + sessionId);
+    session = await ai.loadSession(sessionId, {
+      store: new FSSessionStore(),
+    });
+  }
+  
+  
+  
+  
+  const chat = session.chat();
+  sess().id = chat.session.id;
   
   try {
     const { text } = await chat.send({
       //'Hello, I am a stock trader'
-      prompt: params.message,
+      prompt: message,
       tools: [ buy ]
     });
   

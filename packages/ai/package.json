@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js",
+    "./session": "./dist/session.js",
     "./tokens": "./dist/tokens.js"
   },
   "scripts": {
