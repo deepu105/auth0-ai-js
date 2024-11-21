@@ -7,13 +7,6 @@ var indexRouter = require('./routes/index');
 //var oauth2Router = require('./routes/oauth2');
 //var cibaRouter = require('./routes/ciba');
 
-/*
-curl --header "Content-Type: application/json" \
-  --request POST \
-  --data '{"message":"Hello"}' \
-  http://localhost:3000/api/login
-*/
-
 var app = express();
 
 app.use(logger('dev'));
@@ -21,7 +14,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/', indexRouter);
-
 //app.use('/oauth2', oauth2Router);
 //app.use('/oauth2', cibaRouter);
 
