@@ -5,8 +5,6 @@ import { readFile, writeFile } from 'node:fs/promises';
 
 export class FSSessionStore<S = any> implements SessionStore<S> {
   async get(sessionId: string): Promise<SessionData<S> | undefined> {
-    console.log('GET SESSION: ' + sessionId);
-    
     try {
       const s = await readFile(`${sessionId}.json`, { encoding: 'utf8' });
       const data = JSON.parse(s);
@@ -17,9 +15,6 @@ export class FSSessionStore<S = any> implements SessionStore<S> {
   }
 
   async save(sessionId: string, sessionData: SessionData<S>): Promise<void> {
-    console.log('SAVE SESSION: ' + sessionId);
-    console.log(sessionData);
-    
     const s = JSON.stringify(sessionData);
     await writeFile(`${sessionId}.json`, s, { encoding: 'utf8' });
   }

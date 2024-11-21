@@ -1,3 +1,4 @@
+/*
 import { Orchestrator, AuthorizationError } from "@auth0/ai";
 
 export class LlamaIndexOrchestrator extends Orchestrator {
@@ -19,7 +20,16 @@ export class LlamaIndexOrchestrator extends Orchestrator {
         //console.log(ex.scope);
         
         if (ex instanceof AuthorizationError) {
-          var transactionID = await this.authorizer.authorize(ex);
+          //var transactionID = await this.authorizer.authorize(ex);
+          // FIXME: plumbing...
+          var transactionID = await this.authorizer.authorize({
+            scope: [ 'openid' ],
+            //loginHint: 'janedoe@example.com'
+            //loginHint: JSON.stringify({ format: 'iss_sub', iss: 'https://ai-117332.us.auth0.com/', sub: 'auth0|672d15e3a67830e930d6679b' }),
+            loginHint: 'auth0|672d15e3a67830e930d6679b',
+            // FIXME: This shouldn't be necessary, but its required currently
+            bindingMessage: 'FIXME'
+          });
 
           // Slice off the last message, under the assumption that it was a tool call that failed
           // TODO: make this more robust by checking
@@ -49,3 +59,4 @@ export class LlamaIndexOrchestrator extends Orchestrator {
     }
   }
 }
+*/
