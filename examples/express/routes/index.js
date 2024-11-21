@@ -11,7 +11,7 @@ var agent = require('../../agent-genkit');
 
 
 
-const authorizer = new auth0AI.Auth0PollingCIBAAuthorizer({
+const authorizer = new auth0AI.Auth0NotificationCIBAAuthorizer({
   domain: process.env['DOMAIN'],
   clientId: process.env['CLIENT_ID'],
   clientSecret: process.env['CLIENT_SECRET']
