@@ -32,7 +32,7 @@ const main = defineCommand({
       id: 'auth0|672d15e3a67830e930d6679b'
     }
     
-    let rv = await interactivePrompt({ user: user }, { message: args.message });
+    let rv = await interactivePrompt({ user: user }, args.message);
     console.log(rv.message);
   },
 });
