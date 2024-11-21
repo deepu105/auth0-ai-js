@@ -2,8 +2,9 @@
 
 `agent-genkit` is an example stock trading agent implemented in [Genkit](https://firebase.google.com/docs/genkit)
 for [Node.js](https://nodejs.org/).  The agent supports multi-turn conversations
-by persisting messages sent within a chat session.  The agent executes trades
-via tool calling which, in turn, call APIs.
+by persisting messages sent within a [chat session](https://firebase.google.com/docs/genkit/chat).
+The agent executes trades via [tool calling](https://firebase.google.com/docs/genkit/tool-calling)
+which, in turn, call APIs.
 
 In order to impose guardrails on the agent, APIs can, in real-time, apply
 policies such as requiring human approval for any trade that exceeds a certain
