@@ -38,6 +38,12 @@ export function interact(fn, authorizer) {
           params.realm = error.realm;
           
           var token = await authorizer.authorize(params, error.sessionId);
+          if (!token) {
+            console.log('NO TOKEN, STATELESS...');
+            return
+          }
+          
+          
           // FIXME: preserve the passed in context better here.
           ctx.session = ctx.session || {};
           ctx.session.id = error.sessionId;
