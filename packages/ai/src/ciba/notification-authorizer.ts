@@ -1,10 +1,15 @@
 import { Authorizer } from '../authorizer'
 import { AuthorizationError, AuthorizationOptions } from '../errors/authorizationerror'
 import { CIBAAuthorizerOptions } from './polling-authorizer'
+import { StateStore } from '../state/state-store'
 import { randomBytes } from 'crypto';
 import { promisify } from 'util';
 
 const randomBytesPromise = promisify(randomBytes);
+
+interface NotificationCIBAAuthorizerOptions extends CIBAAuthorizerOptions {
+  store?: StateStore;
+}
 
 
 export class NotificationCIBAAuthorizer implements Authorizer {
@@ -12,19 +17,21 @@ export class NotificationCIBAAuthorizer implements Authorizer {
   tokenURL
   clientId
   clientSecret
+  store: StateStore
   
-  constructor(options: CIBAAuthorizerOptions) {
+  constructor(options: NotificationCIBAAuthorizerOptions) {
     this.authorizationURL = options.authorizationURL;
     this.tokenURL = options.tokenURL;
     this.clientId = options.clientId;
     this.clientSecret = options.clientSecret;
+    this.store = options.store;  // TODO: make default in-memory store
   }
   
   async authorize(params: AuthorizationOptions) {
     console.log('NOTIFICATION AUTHORIZE...');
     
     const bytes = await randomBytesPromise(20);
-    const token = bytes.toString('base64');
+    const token = bytes.toString('base64url');
     console.log(token)
     
     
@@ -65,6 +72,9 @@ export class NotificationCIBAAuthorizer implements Authorizer {
     //return json.auth_req_id;
     
     //return await this.poll(json.auth_req_id)
+    
+    
+    await this.store.save(token, { foo: 'bar' });
     
     
     return await this.wait(json.auth_req_id)
