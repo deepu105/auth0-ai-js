@@ -14,7 +14,8 @@ var agent = require('../../agent-genkit');
 const authorizer = new auth0AI.Auth0NotificationCIBAAuthorizer({
   domain: process.env['DOMAIN'],
   clientId: process.env['CLIENT_ID'],
-  clientSecret: process.env['CLIENT_SECRET']
+  clientSecret: process.env['CLIENT_SECRET'],
+  store: new auth0AI.FSStateStore('.')
 });
 
 const interactivePrompt = auth0AI.interact(agent.prompt, authorizer);
