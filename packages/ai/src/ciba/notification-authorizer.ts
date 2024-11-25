@@ -52,7 +52,7 @@ export class NotificationCIBAAuthorizer implements Authorizer {
     if (params.acrValues) { body.acr_values = params.acrValues.join(' ') }
     if (params.scope) { body.scope = params.scope.join(' ') }
     if (params.bindingMessage) { body.binding_message = params.bindingMessage }
-    //body.client_notification_token = token;
+    body.client_notification_token = token;
     
     console.log(body);
     
@@ -74,7 +74,10 @@ export class NotificationCIBAAuthorizer implements Authorizer {
     //return await this.poll(json.auth_req_id)
     
     
-    await this.store.save(token, { foo: 'bar' });
+    // TODO: get the arguments from context...
+    var d = { authReqId: json.auth_req_id, state: { foo: 'bar' } }
+    
+    await this.store.save(token, d);
     
     
     return await this.wait(json.auth_req_id)
