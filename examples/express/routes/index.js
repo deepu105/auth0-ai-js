@@ -11,8 +11,8 @@ var agent = require('../../agent-genkit');
 
 
 
-const authorizer = new auth0AI.Auth0NotificationCIBAAuthorizer({
-  domain: process.env['DOMAIN'],
+const authorizer = new auth0AI.NotificationCIBAAuthorizer({
+  authorizationURL: 'http://localhost:8080/oauth2/bc-authorize',
   clientId: process.env['CLIENT_ID'],
   clientSecret: process.env['CLIENT_SECRET'],
   store: new auth0AI.FSStateStore('.')
