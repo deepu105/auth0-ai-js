@@ -9,6 +9,7 @@ db.serialize(function() {
   db.run("CREATE TABLE IF NOT EXISTS authorization_requests ( \
     id TEXT PRIMARY KEY, \
     scope TEXT, \
+    notification_token TEXT, \
     is_approved INTEGER \
   )");
 });

@@ -10,9 +10,10 @@ router.post('/bc-authorize', function(req, res, next) {
   console.log(req.body)
   
   var uuid = crypto.randomUUID();
-  db.run('INSERT INTO authorization_requests (id, scope) VALUES (?, ?)', [
+  db.run('INSERT INTO authorization_requests (id, scope, notification_token) VALUES (?, ?, ?)', [
     uuid,
     req.body.scope,
+    req.body.client_notification_token
   ], function(err) {
     if (err) { return next(err); }
 
