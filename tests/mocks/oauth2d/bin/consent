@@ -13,4 +13,29 @@ db.run('UPDATE authorization_requests SET is_approved = ? WHERE id = ?', [
     return;
   }
   console.log('Approved.');
+  
+  db.get('SELECT * FROM authorization_requests WHERE id = ?', [ argv.t ], function(err, row) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    
+    if (row.notification_token) {
+      console.log('Sending ping callback to client...');
+      
+      var headers = {
+        'Authorization': 'Bearer ' + row.notification_token,
+        //'Content-Type:': 'application/json'
+      };
+      var body = {
+        auth_req_id: row.id
+      };
+      
+      fetch('http://localhost:3000/cb', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+      });
+    }
+  });
 });
