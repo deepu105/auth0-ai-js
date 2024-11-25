@@ -4,8 +4,6 @@ var path = require('path');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-//var oauth2Router = require('./routes/oauth2');
-//var cibaRouter = require('./routes/ciba');
 
 var app = express();
 
@@ -14,8 +12,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/', indexRouter);
-//app.use('/oauth2', oauth2Router);
-//app.use('/oauth2', cibaRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
