@@ -1,5 +1,5 @@
 /**
- * GenKit Example: Retrievers with OKTA FGA (Fine-Grained Authorization)
+ * GenKit Example: Retrievers with Okta FGA (Fine-Grained Authorization)
  *
  *
  */
@@ -16,7 +16,7 @@ import { documentsRetriever, executeQuery, initializeGenkit } from "./helpers";
 initializeGenkit();
 
 /**
- * Demonstrates the usage of the OKTA FGA (Fine-Grained Authorization)
+ * Demonstrates the usage of the Okta FGA (Fine-Grained Authorization)
  * with a vector store index to query documents with permission checks.
  *
  * It performs the following steps:
@@ -25,7 +25,7 @@ initializeGenkit();
  *    3. Executes the user query and logs the response.
  *
  * The retrieveWithFGA checks if the user has the "viewer" relation to the document
- * based on predefined tuples in OKTA FGA.
+ * based on predefined tuples in Okta FGA.
  *
  * Example:
  * - A tuple {user: "user:*", relation: "viewer", object: "doc:public-doc"} allows all users to view "public-doc".
@@ -35,7 +35,7 @@ initializeGenkit();
  */
 async function main() {
   console.log(
-    "\n..:: GenKit Example: Retrievers with OKTA FGA (Fine-Grained Authorization)\n\n"
+    "\n..:: GenKit Example: Retrievers with Okta FGA (Fine-Grained Authorization)\n\n"
   );
 
   // UserID
@@ -66,7 +66,7 @@ async function main() {
   console.log(await runFlow(demoFlow, "Show me forecast for ZEKO?"));
 
   /**
-   * If we add the following tuple to the OKTA FGA:
+   * If we add the following tuple to the Okta FGA:
    *
    *    { user: "user:user1", relation: "viewer", object: "doc:private-doc" }
    *
