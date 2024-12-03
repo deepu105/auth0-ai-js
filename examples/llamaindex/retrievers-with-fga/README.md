@@ -1,10 +1,10 @@
-## Retrievers with FGA
+## Retrievers with Okta FGA
 
 ## Getting Started
 
 ### Prerequisites
 
-- An OKTA FGA account, you can create one [here](https://dashboard.fga.dev).
+- An Okta FGA account, you can create one [here](https://dashboard.fga.dev).
   - Set up a new store and execute `npm run fga:init` to initialize it with the necessary model and tuples.
 - An OpenAI account and API key create one [here](https://platform.openai.com).
 
@@ -14,7 +14,7 @@
 # OpenAI
 OPENAI_API_KEY=xx-xxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-# OKTA FGA
+# Okta FGA
 FGA_STORE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
 FGA_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
 FGA_CLIENT_SECRET=xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxx

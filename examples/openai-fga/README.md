@@ -1,4 +1,4 @@
-## Retrievers with FGA
+## OpenAI + RAG + Okta FGA
 
 ## Getting Started
 
@@ -28,13 +28,7 @@ FGA_CLIENT_SECRET=xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxx
    $ npm install
    ```
 
-2. Generate the embeddings
-
-   ```sh
-   npm run generate
-   ```
-
-3. Running the example
+2. Running the example
    ```sh
    npm run dev
    ```
