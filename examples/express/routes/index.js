@@ -17,12 +17,13 @@ const store = new auth0AI.FSStateStore('.');
 
 const authorizer = new auth0AI.NotificationCIBAAuthorizer({
   authorizationURL: 'http://localhost:8080/oauth2/bc-authorize',
+  tokenURL: 'http://localhost:8080/oauth2/token',
   clientId: process.env['CLIENT_ID'],
   clientSecret: process.env['CLIENT_SECRET'],
   store: store
 });
 
-const interactivePrompt = auth0AI.interact(agent.prompt, authorizer);
+const interactivePrompt = auth0AI.interact(agent.prompt, authorizer, store);
 
 
 var router = express.Router();
@@ -30,8 +31,8 @@ var router = express.Router();
 router.post('/',
   function(req, res, next) {
     const user = {
-      id: 'auth0|672d15e3a67830e930d6679b'
-    }
+      id: req.body.username
+    };
   
     interactivePrompt({ user: user }, req.body.message)
       .then(function(result) {
@@ -53,7 +54,7 @@ var notificationStrategy = new BearerStrategy(function(token, cb) {
     .then(function(data) {
       console.log(data);
       
-      
+      data.transactionId = token;
       cb(null, true, data);
       
     })
@@ -63,7 +64,7 @@ var notificationStrategy = new BearerStrategy(function(token, cb) {
 router.post('/cb',
   passport.authenticate(notificationStrategy, { session: false }),
   function validateAuthReqIdBinding(req, res, next) {
-    if (req.authInfo.authReqId !== req.body.auth_req_id) {
+    if (req.authInfo.requestId !== req.body.auth_req_id) {
       // TODO: make it an http 402 error
       return next(new Error('invalid auth req id binding'));
     }
@@ -75,6 +76,24 @@ router.post('/cb',
     console.log(req.body)
     console.log(req.user);
     console.log(req.authInfo);
+    
+    authorizer.tokens(req.authInfo.requestId)
+      .then(function(tokens) {
+        console.log('GOT TOKENS');
+        console.log(tokens);
+        
+        req.authInfo.context.tokens = tokens;
+        
+        // FIXME: pass transactionId, not requestId
+        auth0AI.resume(interactivePrompt, req.authInfo.transactionId, req.authInfo.context, req.authInfo.arguments)
+          .then(function(result) {
+            console.log('GOT RESULT')
+            console.log(result)
+          })
+      })
+    
+    
+    
   })
 
 module.exports = router;
