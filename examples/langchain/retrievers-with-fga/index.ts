@@ -1,5 +1,5 @@
 /**
- * Langchain Example: Retrievers with OKTA FGA (Fine-Grained Authorization)
+ * Langchain Example: Retrievers with Okta FGA (Fine-Grained Authorization)
  *
  *
  */
@@ -11,7 +11,7 @@ import { MemoryStore, RetrievalChain } from "./helpers/memory-store";
 import { readDocuments } from "./helpers/read-documents";
 
 /**
- * Demonstrates the usage of the OKTA FGA (Fine-Grained Authorization)
+ * Demonstrates the usage of the Okta FGA (Fine-Grained Authorization)
  * with a vector store index to query documents with permission checks.
  *
  * It performs the following steps:
@@ -22,7 +22,7 @@ import { readDocuments } from "./helpers/read-documents";
  *    5. Executes a query and logs the response.
  *
  * The FGARetriever checks if the user has the "viewer" relation to the document
- * based on predefined tuples in OKTA FGA.
+ * based on predefined tuples in Okta FGA.
  *
  * Example:
  * - A tuple {user: "user:*", relation: "viewer", object: "doc:public-doc"} allows all users to view "public-doc".
@@ -32,7 +32,7 @@ import { readDocuments } from "./helpers/read-documents";
  */
 async function main() {
   console.log(
-    "\n..:: Langchain Example: Retrievers with OKTA FGA (Fine-Grained Authorization)\n\n"
+    "\n..:: Langchain Example: Retrievers with Okta FGA (Fine-Grained Authorization)\n\n"
   );
 
   // UserID
@@ -61,7 +61,7 @@ async function main() {
   console.log(answer);
 
   /**
-   * If we add the following tuple to the OKTA FGA:
+   * If we add the following tuple to the Okta FGA:
    *
    *    { user: "user:user1", relation: "viewer", object: "doc:private-doc" }
    *
