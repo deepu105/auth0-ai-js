@@ -1,8 +1,6 @@
-# agent-genkit
+# agent-llamaindex
 
-This is an example agent implemented using [Genkit](https://firebase.google.com/docs/genkit).
-It supports [chat sessions](https://firebase.google.com/docs/genkit/chat) and
-[tool calling](https://firebase.google.com/docs/genkit/tool-calling).
+This is an example agent implemented using [LlamaIndex.TS](https://ts.llamaindex.ai/).
 
 The tool calls make requests to HTTP endpoints, and expect to be provided with
 an access token that is obtained by `import`ing `'@auth0/ai/tokens'`.  If the

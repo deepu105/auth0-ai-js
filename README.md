@@ -3,17 +3,17 @@
 > [!WARNING]
 > Auth0 AI is currently under development and it is not intended to be used in production, and therefore has no official support.
 
-[Auth0 AI](https://www.auth0.ai/) helps you build secure AI-powered applications
-that operate on behalf of a person.
+[Auth0 AI](https://www.auth0.ai/) helps you build secure AI-powered
+applications.
 
 Developers are using LLMs to build generative AI applications that deliver
 powerful new experiences for customers and employees. Maintaining security and
 privacy while allowing AI agents to assist people in their work and lives is a
-critical need. Auth AI helps you meet these requirements, ensuring that agents
+critical need. Auth0 AI helps you meet these requirements, ensuring that agents
 are properly authorized when taking actions or accessing resources on behalf of
-a person. Common use cases include:
+a person or organization. Common use cases include:
 
-- **User authentication**: Easily implement login experiences, tailor made for
+- **Authenticate users**: Easily implement login experiences, tailor made for
   AI agents and assistants.
 - **Call APIs on users' behalf**: Use secure standards to call APIs from tools,
   integrating your app with other products.
@@ -24,16 +24,16 @@ a person. Common use cases include:
 
 ## Packages
 
-- [`@auth0/ai`](https://github.com/atko-cic-lab/auth0-ai-js/tree/main/packages/ai) -
+- [`@auth0/ai`](https://github.com/auth0-lab/auth0-ai-js/tree/main/packages/ai) -
   Base abstractions for authentication and authorization in AI applications.
 
-- [`@auth0/ai-genkit`](https://github.com/atko-cic-lab/auth0-ai-js/tree/main/packages/ai-genkit) -
+- [`@auth0/ai-genkit`](https://github.com/auth0-lab/auth0-ai-js/tree/main/packages/ai-genkit) -
   Integration with [Genkit](https://firebase.google.com/docs/genkit) framework.
 
-- [`@auth0/ai-llamaindex`](https://github.com/atko-cic-lab/auth0-ai-js/tree/main/packages/ai-llamaindex) -
+- [`@auth0/ai-llamaindex`](https://github.com/auth0-lab/auth0-ai-js/tree/main/packages/ai-llamaindex) -
   Integration with [LlamaIndex.TS](https://ts.llamaindex.ai/) framework.
 
-- [`@auth0/ai-langchain`](https://github.com/atko-cic-lab/auth0-ai-js/tree/main/packages/ai-langchain) -
+- [`@auth0/ai-langchain`](https://github.com/auth0-lab/auth0-ai-js/tree/main/packages/ai-langchain) -
   Integration with [LangchainJS](https://js.langchain.com/docs/introduction/) framework.
 
 ## Running examples

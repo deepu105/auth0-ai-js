@@ -1,7 +1,6 @@
 import { agentAsyncStorage } from './async-storage'
 
-export function session() {
+export function user() {
   const store = agentAsyncStorage.getStore();
-  store.session = store.session || {};
-  return store.session;
+  return store.user;
 }

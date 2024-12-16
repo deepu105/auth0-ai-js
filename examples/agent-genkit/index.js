@@ -1,9 +1,11 @@
 import { genkit, z } from 'genkit';
 import { openAI, gpt4o } from 'genkitx-openai';
-import { AuthorizationError } from '@auth0/ai';
 import { FSSessionStore } from '@auth0/ai-genkit';
+import { user } from '@auth0/ai/user';
 import { session as sess } from '@auth0/ai/session';
 import { tokens } from '@auth0/ai/tokens';
+import { AuthorizationError } from '@auth0/ai';
+import { parseWWWAuthenticateHeader } from 'http-auth-utils';
 
 
 const ai = genkit({
@@ -22,36 +24,52 @@ const buy = ai.defineTool(
     outputSchema: z.string(),
   },
   async ({ ticker, qty }) => {
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    const body = {
+      ticker: ticker,
+      qty: qty
+    };
+    
+    const u = user();
+    console.log('Buying stock for user: ')
+    console.log(u);
+    
     const accessToken = tokens().accessToken;
-    if (!accessToken) {
-      throw new AuthorizationError('You need authorization to buy stock', 'insufficient_scope', { scope: [ 'openid', 'stock.buy' ] });
+    if (accessToken) {
+      headers['Authorization'] = 'Bearer ' + accessToken.value;
     }
-  
-    return 'OK'
+    
+    const response = await fetch('http://localhost:8081/', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body),
+    });
+    if (response.status == 401) {
+      const challenge = parseWWWAuthenticateHeader(response.headers.get('WWW-Authenticate'));
+      console.log(challenge);
+      throw new AuthorizationError('You need authorization to buy stock', 'insufficient_scope', { scope: challenge.data.scope });
+    }
+    
+    var json = await response.json();
+    return 'OK';
   }
 );
 
 
 export async function prompt(message) {
-  console.log('## PROMPT ###');
-  console.log(sess());
-  console.log(tokens());
-  
   const sessionId = sess().id;
   let session;
   if (!sessionId) {
-    console.log('create session!');
     session = ai.createSession({
       store: new FSSessionStore(),
     });
   } else {
-    console.log('load session! ' + sessionId);
     session = await ai.loadSession(sessionId, {
       store: new FSSessionStore(),
     });
   }
-  
-  
   
   
   const chat = session.chat();
@@ -75,9 +93,6 @@ export async function prompt(message) {
       // system method saying that authorization was requested, in which case
       // `chat.updateMessages()` would be the correct approach.
       await chat.session.store.save(chat.session.id, chat.session.sessionData);
-      
-      // Set `sessionId` property on the authorization error.
-      error.sessionId = chat.session.id;
     }
     
     throw error;

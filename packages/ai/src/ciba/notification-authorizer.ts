@@ -1,5 +1,5 @@
-import { Authorizer } from '../authorizer'
-import { AuthorizationError, AuthorizationOptions } from '../errors/authorizationerror'
+import { Authorizer, AuthorizationOptions } from '../authorizer'
+import { AuthorizationError } from '../errors/authorizationerror'
 import { CIBAAuthorizerOptions } from './polling-authorizer'
 import { StateStore } from '../state/state-store'
 import { randomBytes } from 'crypto';
@@ -77,10 +77,17 @@ export class NotificationCIBAAuthorizer implements Authorizer {
     // TODO: get the arguments from context...
     var d = { authReqId: json.auth_req_id, state: { foo: 'bar' } }
     
-    await this.store.save(token, d);
+    //await this.store.save(token, d);
     
     
-    return await this.wait(json.auth_req_id)
+    const pending = {
+      transactionId: token,
+      requestId: json.auth_req_id
+    }
+    
+    return Promise.resolve(pending);
+    
+    //return await this.wait(json.auth_req_id)
   }
   
   // TODO: make this private
@@ -88,6 +95,43 @@ export class NotificationCIBAAuthorizer implements Authorizer {
     console.log('waiting for notification: ' + reqId);
   }
   
+  async tokens(reqId: string) {
+    console.log('GET TOKENS!');
+    console.log(reqId)
+    
+    
+    var headers = {};
+    const body = {
+      grant_type: 'urn:openid:params:grant-type:ciba',
+      auth_req_id: reqId
+    }
+    
+    
+    if (this.clientId && this.clientSecret) {
+      headers['Authorization'] = 'Basic ' + Buffer.from([ this.clientId, this.clientSecret ].join(':')).toString('base64')
+    }
+    
+    headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    const response = await fetch(this.tokenURL, {
+      method: 'POST',
+      headers: headers,
+      body: new URLSearchParams(body).toString(),
+      // ...
+    });
+    
+    var json = await response.json();
+    console.log('GOT JSON');
+    console.log(json)
+    
+    const credentials = {
+      accessToken: {
+        type: json.token_type || 'bearer', // FIXME: Auth0 is not returnin token_type
+        value: json.access_token
+      }
+    }
+    
+    return credentials;
+  }
   
 }
 
