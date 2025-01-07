@@ -19,6 +19,10 @@
    FGA_STORE_ID=
    FGA_CLIENT_ID=
    FGA_CLIENT_SECRET=
+   # Optional
+   FGA_API_HOST=api.xxx.fga.dev
+   FGA_API_TOKEN_ISSUER=auth.fga.dev
+   FGA_API_AUDIENCE=https://api.xxx.fga.dev/
    ```
 
 #### Obtain OpenAI API Key
@@ -29,23 +33,23 @@
 
 1. Add the model: Under Model Explorer update the model to contain the model below:
 
-    ```
-    model
-      schema 1.1
-    
-    type user
-    
-    type doc
-      relations
-        define owner: [user]
-        define viewer: [user, user:*]
-        define can_view: viewer or owner
-        define can_edit: owner
-    
-    ```
+   ```
+   model
+     schema 1.1
 
-2. Create a client: Navigate to *Settings* and in the *Authorized Clients* section click **+ Create Client** button. On the new page give your client a name and mark all three client permissions then click **Create**.
-  
+   type user
+
+   type doc
+     relations
+       define owner: [user]
+       define viewer: [user, user:*]
+       define can_view: viewer or owner
+       define can_edit: owner
+
+   ```
+
+2. Create a client: Navigate to _Settings_ and in the _Authorized Clients_ section click **+ Create Client** button. On the new page give your client a name and mark all three client permissions then click **Create**.
+
 3. Copy the information on the modal and update your `.env` file with the values you now have for `FGA_STORE_ID`, `FGA_CLIENT_ID`, and `FGA_CLIENT_SECRET`.
 
 ### How to run it
