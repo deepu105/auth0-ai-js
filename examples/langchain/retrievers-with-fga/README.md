@@ -18,6 +18,10 @@ OPENAI_API_KEY=xx-xxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxx
 FGA_STORE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
 FGA_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
 FGA_CLIENT_SECRET=xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxx
+# Optional
+FGA_API_HOST=api.xxx.fga.dev
+FGA_API_TOKEN_ISSUER=auth.fga.dev
+FGA_API_AUDIENCE=https://api.xxx.fga.dev/
 ```
 
 ### How to run it

@@ -52,13 +52,14 @@ export class FGARetriever<T extends ClientCheckRequest> extends BaseRetriever {
       fgaClient ||
       new OpenFgaClient({
         apiScheme: "https",
-        apiHost: "api.us1.fga.dev",
+        apiHost: process.env.FGA_API_HOST || "api.us1.fga.dev",
         storeId: process.env.FGA_STORE_ID!,
         credentials: {
           method: CredentialsMethod.ClientCredentials,
           config: {
-            apiTokenIssuer: "fga.us.auth0.com",
-            apiAudience: "https://api.us1.fga.dev/",
+            apiTokenIssuer: process.env.FGA_API_TOKEN_ISSUER || "auth.fga.dev",
+            apiAudience:
+              process.env.FGA_API_AUDIENCE || "https://api.us1.fga.dev/",
             clientId: process.env.FGA_CLIENT_ID!,
             clientSecret: process.env.FGA_CLIENT_SECRET!,
           },
