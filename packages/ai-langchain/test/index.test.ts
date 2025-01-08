@@ -1,10 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { FGARetriever } from "../src/retrievers/fga-retriever";
-import {
-  OpenFgaClient,
-  ClientCheckRequest,
-  CredentialsMethod,
-} from "@openfga/sdk";
+import { OpenFgaClient, CredentialsMethod } from "@openfga/sdk";
 import { Document } from "@langchain/core/documents";
 import { BaseRetriever } from "@langchain/core/retrievers";
 
