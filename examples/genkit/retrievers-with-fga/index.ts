@@ -7,7 +7,8 @@ import "dotenv/config";
 
 import * as z from "zod";
 
-import { FGARetriever } from "@auth0/ai-genkit";
+// import { FGARetriever } from "@auth0/ai-genkit";
+import { FGARetriever } from "./helpers/fga-retriever";
 import { retrieve } from "@genkit-ai/ai";
 import { defineFlow, runFlow } from "@genkit-ai/flow";
 

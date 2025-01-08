@@ -49,7 +49,8 @@ export class FGARetriever {
     this.fgaClient =
       fgaClient ||
       new OpenFgaClient({
-        apiUrl: process.env.FGA_API_URL || "https://api.us1.fga.dev",
+        apiScheme: "https",
+        apiHost: process.env.FGA_API_HOST || "api.us1.fga.dev",
         storeId: process.env.FGA_STORE_ID!,
         credentials: {
           method: CredentialsMethod.ClientCredentials,
@@ -65,13 +66,13 @@ export class FGARetriever {
   }
 
   /**
-   * Creates a new FGARetriever instance for filtering documents based on custom query logic.
+   * Creates an instance of FGARetriever.
    *
-   * @param args.buildQuery - A function that checks the FGARetriever query.
-   * @param args.retriever - An optional GenKit retriever.
-   * @param args.registry - An optional GenKit Registry.
+   * @param buildQuery - A function that checks the FGARetriever query.
+   * @param retriever - An optional GenKit retriever.
+   * @param registry - An optional GenKit Registry.
    * @param fgaClient - An optional OpenFgaClient instance.
-   * @returns A RetrieverAction instance.
+   * @returns A new FGARetriever instance.
    */
   static create<CustomOptions extends z.ZodTypeAny = z.ZodTypeAny>(
     { buildQuery, retriever, registry }: FGARetrieverProps<CustomOptions>,
@@ -99,7 +100,7 @@ export class FGARetriever {
       }
     );
 
-    auth0Registry.registerAction("retriever", fgaRetriever);
+    // auth0Registry.registerAction("retriever", fgaRetriever);
 
     return fgaRetriever;
   }
@@ -107,7 +108,7 @@ export class FGARetriever {
   /**
    * Checks permissions for a list of client requests.
    *
-   * @param requests - An array of `ClientCheckRequest` objects representing the permissions to be checked.
+   * @param checks - An array of `ClientCheckRequest` objects representing the permissions to be checked.
    * @returns A promise that resolves to a `Map` where the keys are object identifiers and the values are booleans indicating whether the permission is allowed.
    */
   private async checkPermissions(
