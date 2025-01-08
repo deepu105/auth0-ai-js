@@ -64,11 +64,11 @@ export class FGARetriever {
   }
 
   /**
-   * Creates an instance of FGARetriever.
+   * Creates a new FGARetriever instance for filtering documents based on custom query logic.
    *
-   * @param buildQuery - A function that checks the FGARetriever query.
+   * @param args - The properties used to configure the FGARetriever. Query builder and the base retriever.
    * @param fgaClient - An optional OpenFgaClient instance.
-   * @returns A new FGARetriever instance.
+   * @returns A RetrieverAction instance.
    */
   static create<CustomOptions extends z.ZodTypeAny = z.ZodTypeAny>(
     { buildQuery, retriever }: FGARetrieverProps<CustomOptions>,
@@ -97,7 +97,7 @@ export class FGARetriever {
   /**
    * Checks permissions for a list of client requests.
    *
-   * @param checks - An array of `ClientCheckRequest` objects representing the permissions to be checked.
+   * @param requests - An array of `ClientCheckRequest` objects representing the permissions to be checked.
    * @returns A promise that resolves to a `Map` where the keys are object identifiers and the values are booleans indicating whether the permission is allowed.
    */
   private async checkPermissions(
