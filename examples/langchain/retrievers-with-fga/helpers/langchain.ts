@@ -8,6 +8,15 @@ import { BaseRetrieverInterface } from "@langchain/core/retrievers";
 import { Runnable, RunnableInterface } from "@langchain/core/runnables";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 
+/**
+ * Represents a chain that uses a retriever to gather relevant documents
+ * and then combines them to produce a final output based on user questions.
+ *
+ * @remarks
+ * This chain utilizes a language model to summarize or synthesize the provided
+ * context and to formulate a response. The chain is built upon a retriever
+ * which fetches relevant documents for the queries.
+ */
 export class RetrievalChain {
   private engine: Runnable;
 
@@ -15,6 +24,7 @@ export class RetrievalChain {
     this.engine = engine;
   }
 
+  // Create a retrieval chain with a retriever and a language model
   static async create({
     retriever,
   }: {
@@ -37,6 +47,7 @@ export class RetrievalChain {
     return new RetrievalChain(retrievalChain);
   }
 
+  // Query the retrieval chain with a user question
   async query({ query }: { query: string }) {
     const response = await this.engine.invoke({
       input: query,
@@ -46,6 +57,12 @@ export class RetrievalChain {
   }
 }
 
+/**
+ * Represents an in-memory store for the vector embeddings of the documents.
+ *
+ * @remarks
+ * This store is used to create a vector store retriever for the retrieval chain.
+ */
 export class MemoryStore {
   private store: MemoryVectorStore;
 

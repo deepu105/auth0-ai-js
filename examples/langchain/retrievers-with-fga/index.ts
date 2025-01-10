@@ -1,25 +1,17 @@
 /**
- * Langchain Example: Retrievers with Okta FGA (Fine-Grained Authorization)
+ * LangChain Example: Retrievers with Okta FGA (Fine-Grained Authorization)
  *
  *
  */
 import "dotenv/config";
-
 import { FGARetriever } from "@auth0/ai-langchain";
 
-import { MemoryStore, RetrievalChain } from "./helpers/memory-store";
+import { MemoryStore, RetrievalChain } from "./helpers/langchain";
 import { readDocuments } from "./helpers/read-documents";
 
 /**
  * Demonstrates the usage of the Okta FGA (Fine-Grained Authorization)
  * with a vector store index to query documents with permission checks.
- *
- * It performs the following steps:
- *    1. Defines a user ID.
- *    2. Reads documents from a data source.
- *    3. Creates a MemoryStore from the documents.
- *    4. Sets up a retrievalChain with an FGARetriever to enforce permissions.
- *    5. Executes a query and logs the response.
  *
  * The FGARetriever checks if the user has the "viewer" relation to the document
  * based on predefined tuples in Okta FGA.
@@ -31,18 +23,22 @@ import { readDocuments } from "./helpers/read-documents";
  * The output of the query depends on the user's permissions to view the documents.
  */
 async function main() {
-  console.log(
+  console.info(
     "\n..:: Langchain Example: Retrievers with Okta FGA (Fine-Grained Authorization)\n\n"
   );
 
   // UserID
   const user = "user1";
+  // 1. Read and load documents from the assets folder
   const documents = await readDocuments();
+  // 2. Create an in-memory vector store from the documents for OpenAI models.
   const vectorStore = await MemoryStore.fromDocuments(documents);
+  // 3. Create a retrieval chain with root prompt and OpenAI model configuration
   const retrievalChain = await RetrievalChain.create({
-    // Decorate the retriever with the FGARetriever to check the permissions.
+    // 4. Chain the retriever with the FGARetriever to check the permissions.
     retriever: FGARetriever.create({
       retriever: vectorStore.asRetriever(),
+      // FGA tuple to query for the user's permissions
       buildQuery: (doc) => ({
         user: `user:${user}`,
         object: `doc:${doc.metadata.id}`,
@@ -50,15 +46,15 @@ async function main() {
       }),
     }),
   });
-
+  // 5. Query the retrieval chain with a prompt
   const { answer } = await retrievalChain.query({
-    query: "Show me forecast for ZEKO?",
+    query: "What are core techniolgies of Zeko",
   });
 
   /**
    * Output: `The provided context does not include specific financial forecasts...`
    */
-  console.log(answer);
+  console.info(answer);
 
   /**
    * If we add the following tuple to the Okta FGA:
