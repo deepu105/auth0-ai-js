@@ -12,15 +12,14 @@ describe("FGARetriever", () => {
     _getRelevantDocuments: vi.fn(),
   } as unknown as BaseRetriever;
 
-  const mockBuildQuery = vi.fn((doc: Document, query: string) => ({
+  const mockBuildQuery = vi.fn((doc: Document) => ({
     object: `doc:${doc.metadata.id}`,
     relation: "viewer",
     user: "user:user1",
   }));
 
   const mockClient = new OpenFgaClient({
-    apiScheme: "https",
-    apiHost: "api.us1.fga.dev",
+    apiUrl: "https://api.us1.fga.dev",
     storeId: "01GGXW367SRH9YFXJ7GHJN0GMK",
     credentials: {
       method: CredentialsMethod.ClientCredentials,
@@ -33,8 +32,16 @@ describe("FGARetriever", () => {
     },
   });
 
-  // @ts-ignore
-  mockClient.batchCheck = vi.fn();
+  const mockDocuments = [
+    new Document({
+      metadata: { id: "public-doc" },
+      pageContent: "public content",
+    }),
+    new Document({
+      metadata: { id: "private-doc" },
+      pageContent: "private content",
+    }),
+  ];
 
   const args = {
     retriever: mockRetriever,
@@ -53,33 +60,13 @@ describe("FGARetriever", () => {
 
   it("should filter relevant documents based on accessByDocument results", async () => {
     const retriever = FGARetriever.create(args, mockClient);
-    const mockDocuments = [
-      new Document({
-        metadata: { id: "public-doc" },
-        pageContent: "public content",
-      }),
-      new Document({
-        metadata: { id: "private-doc" },
-        pageContent: "private content",
-      }),
-    ];
     // @ts-ignore
     mockRetriever._getRelevantDocuments.mockResolvedValue(mockDocuments);
     // @ts-ignore
-    mockClient.batchCheck.mockResolvedValue({
+    mockClient.batchCheck = vi.fn().mockResolvedValue({
       responses: [
-        {
-          allowed: true,
-          _request: {
-            object: "doc:public-doc",
-          },
-        },
-        {
-          allowed: false,
-          _request: {
-            object: "doc:private-doc",
-          },
-        },
+        { _request: { object: "doc:public-doc" }, allowed: true },
+        { _request: { object: "doc:private-doc" }, allowed: false },
       ],
     });
 
