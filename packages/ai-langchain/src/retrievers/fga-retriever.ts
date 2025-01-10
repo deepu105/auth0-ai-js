@@ -51,8 +51,7 @@ export class FGARetriever<T extends ClientCheckRequest> extends BaseRetriever {
     const client =
       fgaClient ||
       new OpenFgaClient({
-        apiScheme: "https",
-        apiHost: process.env.FGA_API_HOST || "api.us1.fga.dev",
+        apiUrl: process.env.FGA_API_URL || "https://api.us1.fga.dev",
         storeId: process.env.FGA_STORE_ID!,
         credentials: {
           method: CredentialsMethod.ClientCredentials,

@@ -12,8 +12,7 @@ import { CredentialsMethod, OpenFgaClient } from "@openfga/sdk";
  */
 async function main() {
   const fgaClient = new OpenFgaClient({
-    apiScheme: "https",
-    apiHost: process.env.FGA_API_HOST || "api.us1.fga.dev",
+    apiUrl: process.env.FGA_API_URL || "https://api.us1.fga.dev",
     storeId: process.env.FGA_STORE_ID!,
     credentials: {
       method: CredentialsMethod.ClientCredentials,
@@ -27,13 +26,9 @@ async function main() {
   });
 
   // 01. CONFIGURE PRE-DEFINED TUPLES
-  await fgaClient.write(
-    {
-      writes: [
-        { user: "user:*", relation: "viewer", object: "doc:public-doc" },
-      ],
-    }
-  );
+  await fgaClient.write({
+    writes: [{ user: "user:*", relation: "viewer", object: "doc:public-doc" }],
+  });
 }
 
 main().catch(console.error);
