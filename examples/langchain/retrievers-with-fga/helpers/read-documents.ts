@@ -6,19 +6,20 @@ async function readDoc(path: string) {
   return await fs.readFile(path, "utf-8");
 }
 
+/* Reads documents from the assets folder and converts them to langChain Documents */
 export async function readDocuments() {
-  const document1 = new Document({
-    pageContent: await readDoc("./assets/docs/public-doc.md"),
-    metadata: {
-      id: "public-doc",
-    },
-  });
-  const document2 = new Document({
-    pageContent: await readDoc("./assets/docs/private-doc.md"),
-    metadata: {
-      id: "private-doc",
-    },
-  });
+  const folderPath = "./assets/docs";
+  const files = await fs.readdir(folderPath);
+  const documents: Document[] = [];
 
-  return [document1, document2];
+  for (const file of files) {
+    documents.push(
+      new Document({
+        pageContent: await readDoc(`${folderPath}/${file}`),
+        metadata: { id: file.slice(0, file.lastIndexOf(".")) },
+      })
+    );
+  }
+
+  return documents;
 }

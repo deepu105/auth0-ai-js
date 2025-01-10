@@ -23,7 +23,6 @@ This example demonstrates how to combine [LangChain](https://js.langchain.com/do
     FGA_CLIENT_SECRET=xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxx
     # Optional
     FGA_API_HOST=api.xxx.fga.dev
-    FGA_API_TOKEN_ISSUER=auth.fga.dev
     FGA_API_AUDIENCE=https://api.xxx.fga.dev/
    ```
 
@@ -33,42 +32,30 @@ This example demonstrates how to combine [LangChain](https://js.langchain.com/do
 
 #### Configure Okta FGA
 
-1. **Add the model**
-
-   Under Model Explorer update the model to contain the model below:
-
-   ```
-   model
-     schema 1.1
-
-   type user
-
-   type doc
-     relations
-       define owner: [user]
-       define viewer: [user, user:*]
-       define can_view: viewer or owner
-       define can_edit: owner
-
-   ```
-
-2. **Create a client**
+1. **Create a client**
 
    Navigate to _Settings_ and in the _Authorized Clients_ section click **+ Create Client** button. On the new page give your client a name and mark all three client permissions then click **Create**.
 
-3. Copy the information on the modal and update your `.env` file with the values you now have for `FGA_STORE_ID`, `FGA_CLIENT_ID`, and `FGA_CLIENT_SECRET`.
+2. Copy the information on the modal and update your `.env` file with the values you now have for `FGA_STORE_ID`, `FGA_CLIENT_ID`, and `FGA_CLIENT_SECRET`. Click **Continue** to get values for `FGA_API_HOST` and `FGA_API_AUDIENCE`.
 
 ### How to run it
 
-1. Install dependencies. If you want to run with local dependencies follow root instructions.
+1. Install dependencies.
 
    ```sh
    $ npm install
    ```
 
-2. Running the example
+2. Initialize the FGA model and tuples
+
    ```sh
-   npm run dev
+   $ npm run fga:init
+   ```
+
+3. Running the example
+
+   ```sh
+   npm start
    ```
 
 ---
@@ -82,4 +69,4 @@ This example demonstrates how to combine [LangChain](https://js.langchain.com/do
 </p>
 <p align="center">Auth0 is an easy to implement, adaptable authentication and authorization platform. To learn more checkout <a href="https://auth0.com/why-auth0">Why Auth0?</a></p>
 <p align="center">
-This project is licensed under the MIT license. See the <a href="/LICENSE"> LICENSE</a> file for more info.</p>
+This project is licensed under the Apache 2.0 license. See the <a href="/LICENSE"> LICENSE</a> file for more info.</p>
