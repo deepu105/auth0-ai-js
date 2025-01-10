@@ -14,18 +14,14 @@ describe("FGARetriever", async () => {
     plugins: [auth0()],
   });
 
+  const documents = [
+    Document.fromText("public content", { id: "public-doc" }),
+    Document.fromText("private content", { id: "private-doc" }),
+  ];
+
   const mockRetriever = defineRetriever(
-    {
-      name: `auth0/test-retriever`,
-    },
-    async () => {
-      return {
-        documents: [
-          Document.fromText("public content", { id: "public-doc" }),
-          Document.fromText("private content", { id: "private-doc" }),
-        ],
-      };
-    }
+    { name: `auth0/test-retriever` },
+    async () => ({ documents })
   );
 
   const mockBuildQuery = vi.fn((doc: Document) => ({
@@ -35,8 +31,7 @@ describe("FGARetriever", async () => {
   }));
 
   const mockClient = new OpenFgaClient({
-    apiScheme: "https",
-    apiHost: "api.us1.fga.dev",
+    apiUrl: "https://api.us1.fga.dev",
     storeId: "01GGXW367SRH9YFXJ7GHJN0GMK",
     credentials: {
       method: CredentialsMethod.ClientCredentials,
@@ -48,9 +43,6 @@ describe("FGARetriever", async () => {
       },
     },
   });
-
-  // @ts-ignore
-  mockClient.batchCheck = vi.fn();
 
   const args = {
     retriever: mockRetriever,
@@ -70,26 +62,11 @@ describe("FGARetriever", async () => {
   });
 
   it("should filter relevant documents based on batchCheck results", async () => {
-    const mockDocuments = [
-      Document.fromText("public content", { id: "public-doc" }),
-      Document.fromText("private content", { id: "private-doc" }),
-    ];
-
     // @ts-ignore
-    mockClient.batchCheck.mockResolvedValue({
+    mockClient.batchCheck = vi.fn().mockResolvedValue({
       responses: [
-        {
-          allowed: true,
-          _request: {
-            object: "doc:public-doc",
-          },
-        },
-        {
-          allowed: false,
-          _request: {
-            object: "doc:private-doc",
-          },
-        },
+        { _request: { object: "doc:public-doc" }, allowed: true },
+        { _request: { object: "doc:private-doc" }, allowed: false },
       ],
     });
 
@@ -98,6 +75,6 @@ describe("FGARetriever", async () => {
       query: "input",
     });
 
-    expect(documents).toEqual([mockDocuments[0]]);
+    expect(documents).toEqual([documents[0]]);
   });
 });
