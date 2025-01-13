@@ -37,7 +37,7 @@ This example demonstrates how to combine [LangChain](https://js.langchain.com/do
 
    Navigate to _Settings_ and in the _Authorized Clients_ section click **+ Create Client** button. On the new page give your client a name and mark all three client permissions then click **Create**.
 
-2. Copy the information on the modal and update your `.env` file with the values you now have for `FGA_STORE_ID`, `FGA_CLIENT_ID`, and `FGA_CLIENT_SECRET`. Click **Continue** to get values for `FGA_API_HOST` and `FGA_API_AUDIENCE`.
+2. Copy the information on the modal and update your `.env` file with the values you now have for `FGA_STORE_ID`, `FGA_CLIENT_ID`, and `FGA_CLIENT_SECRET`. Click **Continue** to get values for `FGA_API_URL` and `FGA_API_AUDIENCE`.
 
 ### How to run it
 
