@@ -22,9 +22,9 @@
     "@openfga/sdk": "^0.7.0"
   },
   "devDependencies": {
-    "@types/node": "^22.7.5",
+    "@types/node": "^22.10.6",
     "typedoc": "^0.27.6",
-    "typescript": "^5.6.2",
+    "typescript": "^5.7.3",
     "vitest": "^2.1.3"
   }
 }
