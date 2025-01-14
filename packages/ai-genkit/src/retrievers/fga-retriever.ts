@@ -1,13 +1,11 @@
-import { z } from "zod";
-
+import { z, Genkit } from "genkit";
 import {
-  defineRetriever,
+  CommonRetrieverOptionsSchema,
   Document,
-  retrieve,
   RetrieverArgument,
-} from "@genkit-ai/ai/retriever";
-import { genkitPlugin } from "genkit/plugin";
-import { Registry, ActionType } from "genkit/registry";
+} from "genkit/retriever";
+import { GenkitPlugin, genkitPlugin } from "genkit/plugin";
+
 import {
   ClientCheckRequest,
   ConsistencyPreference,
@@ -28,7 +26,6 @@ type FGAConstructorProps = {
 type FGARetrieverProps<CustomOptions extends z.ZodTypeAny = z.ZodTypeAny> =
   FGAConstructorProps & {
     retriever: RetrieverArgument<CustomOptions>;
-    registry: Registry;
   };
 
 export class FGARetriever {
@@ -69,25 +66,28 @@ export class FGARetriever {
    *
    * @param args.buildQuery - A function that checks the FGARetriever query.
    * @param args.retriever - An optional GenKit retriever.
-   * @param args.registry - An optional GenKit Registry.
+   * @param args.ai - A GenKit Instance.
    * @param fgaClient - An optional OpenFgaClient instance.
    * @returns A RetrieverAction instance.
    */
   static create<CustomOptions extends z.ZodTypeAny = z.ZodTypeAny>(
-    { buildQuery, retriever, registry }: FGARetrieverProps<CustomOptions>,
+    ai: Genkit,
+    { buildQuery, retriever }: FGARetrieverProps<CustomOptions>,
     fgaClient?: OpenFgaClient
   ) {
     const fga = new FGARetriever({ buildQuery }, fgaClient);
 
-    const auth0Registry = new Registry(registry);
+    const fgaRetrieverOptionsSchema = CommonRetrieverOptionsSchema.extend({
+      preRerankK: z.number().max(1000), // TODO: check if this is the correct max value
+    });
 
-    const fgaRetriever = defineRetriever(
-      auth0Registry,
+    const fgaRetriever = ai.defineRetriever(
       {
         name: `auth0/fga-retriever`,
+        configSchema: fgaRetrieverOptionsSchema,
       },
       async (input, options) => {
-        const documents = await retrieve(auth0Registry, {
+        const documents = await ai.retrieve({
           retriever,
           query: input,
           options,
@@ -98,8 +98,6 @@ export class FGARetriever {
         return { documents: filteredDocuments };
       }
     );
-
-    auth0Registry.registerAction("retriever", fgaRetriever);
 
     return fgaRetriever;
   }
@@ -155,4 +153,6 @@ export class FGARetriever {
   }
 }
 
-export const auth0 = genkitPlugin("auth0", async () => {});
+export function auth0(): GenkitPlugin {
+  return genkitPlugin("auth0", async (ai: Genkit) => {});
+}
