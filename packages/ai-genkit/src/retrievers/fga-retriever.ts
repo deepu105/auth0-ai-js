@@ -26,6 +26,7 @@ type FGAConstructorProps = {
 type FGARetrieverProps<CustomOptions extends z.ZodTypeAny = z.ZodTypeAny> =
   FGAConstructorProps & {
     retriever: RetrieverArgument<CustomOptions>;
+    preRerankKMax?: number;
   };
 
 export class FGARetriever {
@@ -64,21 +65,22 @@ export class FGARetriever {
   /**
    * Creates a new FGARetriever instance for filtering documents based on custom query logic.
    *
+   * @param ai - A Genkit Instance.
    * @param args.buildQuery - A function that checks the FGARetriever query.
-   * @param args.retriever - An optional GenKit retriever.
-   * @param args.ai - A GenKit Instance.
+   * @param args.retriever - An optional Genkit retriever.
+   * @param args.preRerankKMax - An optional max value for Genkit preRerankK.
    * @param fgaClient - An optional OpenFgaClient instance.
    * @returns A RetrieverAction instance.
    */
   static create<CustomOptions extends z.ZodTypeAny = z.ZodTypeAny>(
     ai: Genkit,
-    { buildQuery, retriever }: FGARetrieverProps<CustomOptions>,
+    { buildQuery, retriever, preRerankKMax }: FGARetrieverProps<CustomOptions>,
     fgaClient?: OpenFgaClient
   ) {
     const fga = new FGARetriever({ buildQuery }, fgaClient);
 
     const fgaRetrieverOptionsSchema = CommonRetrieverOptionsSchema.extend({
-      preRerankK: z.number().max(1000), // TODO: check if this is the correct max value
+      preRerankK: z.number().max(preRerankKMax || 1000),
     });
 
     const fgaRetriever = ai.defineRetriever(
