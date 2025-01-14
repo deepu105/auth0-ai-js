@@ -20,7 +20,7 @@
     "@genkit-ai/core": "^0.5.17",
     "@genkit-ai/dev-local-vectorstore": "^0.9.12",
     "@genkit-ai/flow": "^0.5.17",
-    "genkitx-openai": "^0.10.1",
+    "genkitx-openai": "^0.12.0",
     "dotenv": "^16.4.5",
     "@openfga/sdk": "^0.7.0"
   }
