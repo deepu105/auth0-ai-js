@@ -18,7 +18,7 @@
     "@auth0/ai-genkit": "*",
     "@genkit-ai/ai": "^0.5.17",
     "@genkit-ai/core": "^0.5.17",
-    "@genkit-ai/dev-local-vectorstore": "^0.5.17",
+    "@genkit-ai/dev-local-vectorstore": "^0.9.12",
     "@genkit-ai/flow": "^0.5.17",
     "genkitx-openai": "^0.10.1",
     "dotenv": "^16.4.5",
