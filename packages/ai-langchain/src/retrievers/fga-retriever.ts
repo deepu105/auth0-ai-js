@@ -1,4 +1,3 @@
-/* From  https://github.com/auth0-lab/auth0-ai-js/blob/main/packages/ai-langchain/src/retrievers/fga-retriever.ts */
 import { Document, DocumentInterface } from "@langchain/core/documents";
 import { BaseRetriever } from "@langchain/core/retrievers";
 import {
@@ -10,31 +9,59 @@ import {
 import type { BaseRetrieverInput } from "@langchain/core/retrievers";
 import type { CallbackManagerForRetrieverRun } from "@langchain/core/callbacks/manager";
 
-type FGARetrieverArgsWithoutCheckFromDocument<T extends ClientBatchCheckItem> =
-  {
-    retriever: BaseRetriever;
-    buildQuery: (
-      doc: DocumentInterface<Record<string, any>>,
-      query: string
-    ) => T;
-    fields?: BaseRetrieverInput;
-  };
+type FGARetrieverCheckerFn<T extends ClientBatchCheckItem> = (
+  doc: DocumentInterface<Record<string, any>>
+) => T;
+
+type FGARetrieverArgsWithoutAccessByDocument<T extends ClientBatchCheckItem> = {
+  retriever: BaseRetriever;
+  buildQuery: FGARetrieverCheckerFn<T>;
+  fields?: BaseRetrieverInput;
+};
+
+type AccessByDocumentFn<T extends ClientBatchCheckItem> = (
+  checks: T[]
+) => Promise<Map<string, boolean>>;
 
 type FGARetrieverArgs<T extends ClientBatchCheckItem> =
-  FGARetrieverArgsWithoutCheckFromDocument<T> & {
-    accessByDocument: (checks: T[]) => Promise<Map<string, boolean>>;
+  FGARetrieverArgsWithoutAccessByDocument<T> & {
+    accessByDocument: AccessByDocumentFn<T>;
   };
 
+/**
+ * A retriever that allows filtering documents based on access control checks
+ * using OpenFGA. This class wraps an underlying retriever and performs batch
+ * checks on retrieved documents, returning only the ones that pass the
+ * specified access criteria.
+ *
+ * @template T - The type representing a single access check request item.
+ *
+ * @remarks
+ * The FGARetriever requires a buildQuery function to specify how access checks
+ * are formed for each document, and an accessByDocument function to execute
+ * the checks via an OpenFGA client or equivalent mechanism. The checks are then
+ * mapped back to their corresponding documents to filter out those for which
+ * access is denied.
+ *
+ * @example
+ * ```ts
+ * const retriever = FGARetriever.create({
+ *   retriever: someOtherRetriever,
+ *   buildQuery: (doc) => ({
+ *     user: `user:${user}`,
+ *     object: `doc:${doc.metadata.id}`,
+ *     relation: "viewer",
+ *   }),
+ * });
+ * ```
+ */
 export class FGARetriever<
   T extends ClientBatchCheckItem
 > extends BaseRetriever {
-  lc_namespace = ["langchain", "retrievers"];
+  lc_namespace = ["@langchain", "retrievers"];
   private retriever: BaseRetriever;
-  private buildQuery: (
-    doc: DocumentInterface<Record<string, any>>,
-    query: string
-  ) => T;
-  private accessByDocument: (checks: T[]) => Promise<Map<string, boolean>>;
+  private buildQuery: FGARetrieverCheckerFn<T>;
+  private accessByDocument: AccessByDocumentFn<T>;
 
   private constructor({
     retriever,
@@ -45,14 +72,21 @@ export class FGARetriever<
     super(fields);
     this.buildQuery = buildQuery;
     this.retriever = retriever;
-
-    this.accessByDocument = accessByDocument as (
-      checks: ClientBatchCheckItem[]
-    ) => Promise<Map<string, boolean>>;
+    this.accessByDocument = accessByDocument as AccessByDocumentFn<T>;
   }
 
+  /**
+   * Creates a new FGARetriever instance using the given arguments and optional OpenFgaClient.
+   *
+   * @param args - @FGARetrieverArgsWithoutAccessByDocument
+   * @param args.retriever - The underlying retriever instance to fetch documents.
+   * @param args.buildQuery - A function to generate access check requests for each document.
+   * @param args.fields - Optional - Additional fields to pass to the underlying retriever.
+   * @param fgaClient - Optional - OpenFgaClient instance to execute checks against.
+   * @returns A newly created FGARetriever instance configured with the provided arguments.
+   */
   static create(
-    args: FGARetrieverArgsWithoutCheckFromDocument<ClientBatchCheckItem>,
+    args: FGARetrieverArgsWithoutAccessByDocument<ClientBatchCheckItem>,
     fgaClient?: OpenFgaClient
   ): FGARetriever<ClientBatchCheckItem> {
     const client =
@@ -71,15 +105,14 @@ export class FGARetriever<
         },
       });
 
-    const accessByDocument = async function accessByDocument(
-      checks: ClientBatchCheckItem[]
-    ): Promise<Map<string, boolean>> {
-      const response = await client.batchCheck({ checks });
-      return response.result.reduce((c: Map<string, boolean>, v) => {
-        c.set(v.request.object, v.allowed || false);
-        return c;
-      }, new Map<string, boolean>());
-    };
+    const accessByDocument: AccessByDocumentFn<ClientBatchCheckItem> =
+      async function (checks) {
+        const response = await client.batchCheck({ checks });
+        return response.result.reduce((c: Map<string, boolean>, v) => {
+          c.set(v.request.object, v.allowed || false);
+          return c;
+        }, new Map<string, boolean>());
+      };
 
     return new FGARetriever({ ...args, accessByDocument });
   }
@@ -95,7 +128,7 @@ export class FGARetriever<
 
     const out = documents.reduce(
       (out, doc) => {
-        const check = this.buildQuery(doc, query);
+        const check = this.buildQuery(doc);
         out.checks.push(check);
         out.documentToObject.set(doc, check.object);
         return out;
