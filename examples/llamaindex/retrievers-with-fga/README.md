@@ -68,7 +68,7 @@ This example demonstrates how to combine [LlamaIndex](https://ts.llamaindex.ai/)
 
 2. Running the example
    ```sh
-   npm run dev
+   npm start
    ```
 
 ---
