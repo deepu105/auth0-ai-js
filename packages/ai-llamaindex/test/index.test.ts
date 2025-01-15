@@ -63,9 +63,9 @@ describe("FGARetriever", () => {
   it("retrieves and filters nodes based on permissions", async () => {
     // @ts-ignore
     mockClient.batchCheck = vi.fn().mockResolvedValue({
-      responses: [
-        { _request: { object: "doc:public-doc" }, allowed: true },
-        { _request: { object: "doc:private-doc" }, allowed: false },
+      result: [
+        { request: { object: "doc:public-doc" }, allowed: true },
+        { request: { object: "doc:private-doc" }, allowed: false },
       ],
     });
 

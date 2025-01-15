@@ -48,7 +48,7 @@ async function main() {
   });
   // 5. Query the retrieval chain with a prompt
   const { answer } = await retrievalChain.query({
-    query: "What are core techniolgies of Zeko",
+    query: "Show me forecast for ZEKO?",
   });
 
   /**

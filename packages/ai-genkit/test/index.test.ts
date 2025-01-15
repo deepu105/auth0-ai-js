@@ -44,18 +44,19 @@ describe("FGARetriever", async () => {
   });
 
   const args = {
+    ai,
     retriever: mockRetriever,
     buildQuery: mockBuildQuery,
   };
 
   it("should create an instance of RetrieverAction with default OpenFgaClient", () => {
-    const retriever = FGARetriever.create(ai, args);
+    const retriever = FGARetriever.create(args);
     expect(retriever).toBeTypeOf("function");
     expect(retriever.__action.name).toBe("auth0/fga-retriever");
   });
 
   it("should create an instance of RetrieverAction with provided OpenFgaClient", () => {
-    const retriever = FGARetriever.create(ai, args, mockClient);
+    const retriever = FGARetriever.create(args, mockClient);
     expect(retriever).toBeTypeOf("function");
     expect(retriever.__action.name).toBe("auth0/fga-retriever");
   });
@@ -63,14 +64,14 @@ describe("FGARetriever", async () => {
   it("should filter relevant documents based on batchCheck results", async () => {
     // @ts-ignore
     mockClient.batchCheck = vi.fn().mockResolvedValue({
-      responses: [
-        { _request: { object: "doc:public-doc" }, allowed: true },
-        { _request: { object: "doc:private-doc" }, allowed: false },
+      result: [
+        { request: { object: "doc:public-doc" }, allowed: true },
+        { request: { object: "doc:private-doc" }, allowed: false },
       ],
     });
 
     const documents = await ai.retrieve({
-      retriever: FGARetriever.create(ai, args, mockClient),
+      retriever: FGARetriever.create(args, mockClient),
       query: "input",
     });
 

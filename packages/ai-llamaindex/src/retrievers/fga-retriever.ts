@@ -7,36 +7,49 @@ import {
 } from "llamaindex";
 
 import {
-  ClientCheckRequest,
+  ClientBatchCheckItem,
   ConsistencyPreference,
   CredentialsMethod,
   OpenFgaClient,
 } from "@openfga/sdk";
 
-export type FGARetrieverCheckerFn = (document: BaseNode<Metadata>) => {
-  user: string;
-  object: string;
-  relation: string;
-};
+export type FGARetrieverCheckerFn = (
+  doc: BaseNode<Metadata>
+) => ClientBatchCheckItem;
 
-export interface FGARetrieverProps {
+export interface FGARetrieverArgs {
   buildQuery: FGARetrieverCheckerFn;
   retriever: BaseRetriever;
 }
 
 /**
- * The `FGARetriever` class extends the `BaseRetriever` and integrates with the OpenFGA client to perform permission checks
- * on retrieved nodes. It uses a checker function to determine the permissions required for each node and filters the nodes
- * based on these permissions.
+ * A retriever that allows filtering documents based on access control checks
+ * using OpenFGA. This class wraps an underlying retriever and performs batch
+ * checks on retrieved documents, returning only the ones that pass the
+ * specified access criteria.
  *
- * @property {string} user - The user identifier for whom the permissions are being checked.
- * @property {BaseRetriever} retriever - The base retriever instance used to fetch nodes.
- * @property {FGARetrieverCheckerFn} checkerFn - A function used to determine the permissions required for each node.
- * @property {OpenFgaClient} fgaClient - Optional - The OpenFGA client instance used to perform permission checks.
+ *
+ * @remarks
+ * The FGARetriever requires a buildQuery function to specify how access checks
+ * are formed for each document, the checks are executed via an OpenFGA client
+ * or equivalent mechanism. The checks are then mapped back to their corresponding
+ * documents to filter out those for which access is denied.
+ *
+ * @example
+ * ```ts
+ * const retriever = FGARetriever.create({
+ *   retriever: someOtherRetriever,
+ *   buildQuery: (doc) => ({
+ *     user: `user:${user}`,
+ *     object: `doc:${doc.metadata.id}`,
+ *     relation: "viewer",
+ *   }),
+ * });
+ * ```
  */
 export class FGARetriever extends BaseRetriever {
+  lc_namespace = ["llamaindex", "retrievers", "fga-retriever"];
   private retriever: BaseRetriever;
-
   private buildQuery: FGARetrieverCheckerFn;
   private fgaClient: OpenFgaClient;
 
@@ -44,10 +57,8 @@ export class FGARetriever extends BaseRetriever {
     return "FGARetriever";
   }
 
-  lc_namespace = ["llamaindex", "retrievers", "fga-retriever"];
-
   private constructor(
-    { buildQuery, retriever }: FGARetrieverProps,
+    { buildQuery, retriever }: FGARetrieverArgs,
     fgaClient?: OpenFgaClient
   ) {
     super();
@@ -72,8 +83,17 @@ export class FGARetriever extends BaseRetriever {
       });
   }
 
+  /**
+   * Creates a new FGARetriever instance using the given arguments and optional OpenFgaClient.
+   *
+   * @param args - @FGARetrieverArgs
+   * @param args.retriever - The underlying retriever instance to fetch documents.
+   * @param args.buildQuery - A function to generate access check requests for each document.
+   * @param fgaClient - Optional - OpenFgaClient instance to execute checks against.
+   * @returns A newly created FGARetriever instance configured with the provided arguments.
+   */
   static create(
-    { buildQuery, retriever }: FGARetrieverProps,
+    { buildQuery, retriever }: FGARetrieverArgs,
     fgaClient?: OpenFgaClient
   ) {
     return new FGARetriever({ buildQuery, retriever }, fgaClient);
@@ -82,19 +102,22 @@ export class FGARetriever extends BaseRetriever {
   /**
    * Checks permissions for a list of client requests.
    *
-   * @param checks - An array of `ClientCheckRequest` objects representing the permissions to be checked.
+   * @param checks - An array of `ClientBatchCheckItem` objects representing the permissions to be checked.
    * @returns A promise that resolves to a `Map` where the keys are object identifiers and the values are booleans indicating whether the permission is allowed.
    */
   private async checkPermissions(
-    requests: ClientCheckRequest[]
+    checks: ClientBatchCheckItem[]
   ): Promise<Map<string, boolean>> {
-    const batchCheckResponse = await this.fgaClient.batchCheck(requests, {
-      consistency: ConsistencyPreference.HigherConsistency,
-    });
+    const response = await this.fgaClient.batchCheck(
+      { checks },
+      {
+        consistency: ConsistencyPreference.HigherConsistency,
+      }
+    );
 
-    return batchCheckResponse.responses.reduce(
-      (permissionMap: Map<string, boolean>, response) => {
-        permissionMap.set(response._request.object, response.allowed || false);
+    return response.result.reduce(
+      (permissionMap: Map<string, boolean>, result) => {
+        permissionMap.set(result.request.object, result.allowed || false);
         return permissionMap;
       },
       new Map<string, boolean>()
@@ -102,7 +125,8 @@ export class FGARetriever extends BaseRetriever {
   }
 
   /**
-   * Retrieves nodes based on the provided query parameters, processes them through a checker function,
+   * Retrieves nodes based on the provided query parameters, processes
+   * them through a checker function,
    * and filters the nodes based on permissions.
    *
    * @param params - The query parameters used to retrieve nodes.
@@ -112,17 +136,14 @@ export class FGARetriever extends BaseRetriever {
     const retrievedNodes = await this.retriever.retrieve(params);
 
     const { checks, documentToObjectMap } = retrievedNodes.reduce(
-      (accumulator, nodeWithScore: NodeWithScore<Metadata>) => {
-        const permissionCheck = this.buildQuery(nodeWithScore.node);
-        accumulator.checks.push(permissionCheck);
-        accumulator.documentToObjectMap.set(
-          nodeWithScore,
-          permissionCheck.object
-        );
-        return accumulator;
+      (acc, nodeWithScore: NodeWithScore<Metadata>) => {
+        const check = this.buildQuery(nodeWithScore.node);
+        acc.checks.push(check);
+        acc.documentToObjectMap.set(nodeWithScore, check.object);
+        return acc;
       },
       {
-        checks: [] as ClientCheckRequest[],
+        checks: [] as ClientBatchCheckItem[],
         documentToObjectMap: new Map<NodeWithScore<Metadata>, string>(),
       }
     );

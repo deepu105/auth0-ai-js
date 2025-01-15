@@ -6,10 +6,9 @@
 import "dotenv/config";
 
 import { VectorStoreIndex } from "llamaindex";
-
 import { FGARetriever } from "@auth0/ai-llamaindex";
 
-import { readDocuments } from "./helpers";
+import { readDocuments } from "./helpers/read-documents";
 
 /**
  * Demonstrates the usage of the Okta FGA (Fine-Grained Authorization)

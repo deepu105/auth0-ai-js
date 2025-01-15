@@ -38,7 +38,8 @@ async function main() {
   // UserID
   const user = "user1";
 
-  const retriever = FGARetriever.create(ai, {
+  const retriever = FGARetriever.create({
+    ai,
     retriever: documentsRetriever,
     buildQuery: (doc) => ({
       user: `user:${user}`,
