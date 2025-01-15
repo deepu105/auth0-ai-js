@@ -1,5 +1,6 @@
 import openAI, { gpt4oMini, textEmbedding3Small } from "genkitx-openai";
-import { auth0 } from "@auth0/ai-genkit";
+// import { auth0 } from "@auth0/ai-genkit";
+import { auth0 } from "./fga-retriever";
 import { Genkit, genkit } from "genkit";
 import { Document } from "genkit/retriever";
 import devLocalVectorstore, {
