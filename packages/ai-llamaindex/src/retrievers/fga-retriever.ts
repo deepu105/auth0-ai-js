@@ -28,7 +28,6 @@ export interface FGARetrieverArgs {
  * checks on retrieved documents, returning only the ones that pass the
  * specified access criteria.
  *
- * @template T - The type representing a single access check request item.
  *
  * @remarks
  * The FGARetriever requires a buildQuery function to specify how access checks

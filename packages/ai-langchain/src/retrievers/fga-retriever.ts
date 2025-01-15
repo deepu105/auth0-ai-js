@@ -34,8 +34,6 @@ type FGARetrieverArgsWithAccessByDocument = FGARetrieverArgs & {
  * checks on retrieved documents, returning only the ones that pass the
  * specified access criteria.
  *
- * @template T - The type representing a single access check request item.
- *
  * @remarks
  * The FGARetriever requires a buildQuery function to specify how access checks
  * are formed for each document, the checks are executed via an OpenFGA client
@@ -75,7 +73,7 @@ export class FGARetriever extends BaseRetriever {
   /**
    * Creates a new FGARetriever instance using the given arguments and optional OpenFgaClient.
    *
-   * @param args - @FGARetrieverArgsWithoutAccessByDocument
+   * @param args - @FGARetrieverArgs
    * @param args.retriever - The underlying retriever instance to fetch documents.
    * @param args.buildQuery - A function to generate access check requests for each document.
    * @param args.fields - Optional - Additional fields to pass to the underlying retriever.
