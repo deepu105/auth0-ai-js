@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
-import { FGARetriever, auth0 } from "../src/retrievers/fga-retriever";
 import { Document } from "genkit/retriever";
 import { genkit } from "genkit";
+import { FGARetriever, auth0 } from "../src/retrievers/fga-retriever";
 
 import { OpenFgaClient, CredentialsMethod } from "@openfga/sdk";
 
