@@ -7,29 +7,54 @@ import {
 import { GenkitPlugin, genkitPlugin } from "genkit/plugin";
 
 import {
-  ClientCheckRequest,
+  ClientBatchCheckItem,
   ConsistencyPreference,
   CredentialsMethod,
   OpenFgaClient,
 } from "@openfga/sdk";
 
-type FGARetrieverCheckerFn = (document: Document) => {
-  user: string;
-  object: string;
-  relation: string;
-};
+export type FGARetrieverCheckerFn = (doc: Document) => ClientBatchCheckItem;
 
-type FGAConstructorProps = {
+export type FGARetrieverConstructorArgs = {
   buildQuery: FGARetrieverCheckerFn;
 };
 
-type FGARetrieverProps<CustomOptions extends z.ZodTypeAny = z.ZodTypeAny> =
-  FGAConstructorProps & {
-    retriever: RetrieverArgument<CustomOptions>;
-    preRerankKMax?: number;
-  };
+export type FGARetrieverArgs<
+  CustomOptions extends z.ZodTypeAny = z.ZodTypeAny
+> = FGARetrieverConstructorArgs & {
+  ai: Genkit;
+  retriever: RetrieverArgument<CustomOptions>;
+  preRerankKMax?: number;
+};
 
+/**
+ * A retriever that allows filtering documents based on access control checks
+ * using OpenFGA. This class wraps an underlying retriever and performs batch
+ * checks on retrieved documents, returning only the ones that pass the
+ * specified access criteria.
+ *
+ *
+ * @remarks
+ * The FGARetriever requires a buildQuery function to specify how access checks
+ * are formed for each document, the checks are executed via an OpenFGA client
+ * or equivalent mechanism. The checks are then mapped back to their corresponding
+ * documents to filter out those for which access is denied.
+ *
+ * @example
+ * ```ts
+ * const retriever = FGARetriever.create({
+ *   ai,
+ *   retriever: someOtherRetriever,
+ *   buildQuery: (doc) => ({
+ *     user: `user:${user}`,
+ *     object: `doc:${doc.metadata.id}`,
+ *     relation: "viewer",
+ *   }),
+ * });
+ * ```
+ */
 export class FGARetriever {
+  lc_namespace = ["genkit", "retrievers", "fga-retriever"];
   private buildQuery: FGARetrieverCheckerFn;
   private fgaClient: OpenFgaClient;
 
@@ -37,10 +62,8 @@ export class FGARetriever {
     return "FGARetriever";
   }
 
-  lc_namespace = ["genkit", "retrievers", "fga-retriever"];
-
   private constructor(
-    { buildQuery }: FGAConstructorProps,
+    { buildQuery }: FGARetrieverConstructorArgs,
     fgaClient?: OpenFgaClient
   ) {
     this.buildQuery = buildQuery;
@@ -63,21 +86,26 @@ export class FGARetriever {
   }
 
   /**
-   * Creates a new FGARetriever instance for filtering documents based on custom query logic.
+   * Creates a new FGARetriever instance using the given arguments and optional OpenFgaClient.
    *
-   * @param ai - A Genkit Instance.
-   * @param args.buildQuery - A function that checks the FGARetriever query.
-   * @param args.retriever - An optional Genkit retriever.
-   * @param args.preRerankKMax - An optional max value for Genkit preRerankK.
-   * @param fgaClient - An optional OpenFgaClient instance.
-   * @returns A RetrieverAction instance.
+   * @param args - @FGARetrieverArgs
+   * @param args.ai - A Genkit Instance.
+   * @param args.retriever - The underlying retriever instance to fetch documents.
+   * @param args.buildQuery - A function to generate access check requests for each document.
+   * @param args.preRerankKMax - Optional - max value for Genkit preRerankK.
+   * @param fgaClient - Optional - OpenFgaClient instance to execute checks against.
+   * @returns A Retriever instance instance configured with the provided arguments.
    */
   static create<CustomOptions extends z.ZodTypeAny = z.ZodTypeAny>(
-    ai: Genkit,
-    { buildQuery, retriever, preRerankKMax }: FGARetrieverProps<CustomOptions>,
+    {
+      ai,
+      buildQuery,
+      retriever,
+      preRerankKMax,
+    }: FGARetrieverArgs<CustomOptions>,
     fgaClient?: OpenFgaClient
   ) {
-    const fga = new FGARetriever({ buildQuery }, fgaClient);
+    const client = new FGARetriever({ buildQuery }, fgaClient);
 
     const fgaRetrieverOptionsSchema = CommonRetrieverOptionsSchema.extend({
       preRerankK: z.number().max(preRerankKMax || 1000),
@@ -95,7 +123,7 @@ export class FGARetriever {
           options,
         });
 
-        const filteredDocuments = await fga.filter(documents);
+        const filteredDocuments = await client.filter(documents);
 
         return { documents: filteredDocuments };
       }
@@ -107,19 +135,22 @@ export class FGARetriever {
   /**
    * Checks permissions for a list of client requests.
    *
-   * @param requests - An array of `ClientCheckRequest` objects representing the permissions to be checked.
+   * @param requests - An array of `ClientBatchCheckItem` objects representing the permissions to be checked.
    * @returns A promise that resolves to a `Map` where the keys are object identifiers and the values are booleans indicating whether the permission is allowed.
    */
   private async checkPermissions(
-    requests: ClientCheckRequest[]
+    checks: ClientBatchCheckItem[]
   ): Promise<Map<string, boolean>> {
-    const batchCheckResponse = await this.fgaClient.batchCheck(requests, {
-      consistency: ConsistencyPreference.HigherConsistency,
-    });
+    const response = await this.fgaClient.batchCheck(
+      { checks },
+      {
+        consistency: ConsistencyPreference.HigherConsistency,
+      }
+    );
 
-    return batchCheckResponse.responses.reduce(
-      (permissionMap: Map<string, boolean>, response) => {
-        permissionMap.set(response._request.object, response.allowed || false);
+    return response.result.reduce(
+      (permissionMap: Map<string, boolean>, result) => {
+        permissionMap.set(result.request.object, result.allowed || false);
         return permissionMap;
       },
       new Map<string, boolean>()
@@ -132,16 +163,16 @@ export class FGARetriever {
    * @param documents - An array of documents to be checked for permissions.
    * @returns A promise that resolves to an array of documents that have passed the permission checks.
    */
-  private async filter(documents: any[]): Promise<Array<Document>> {
+  private async filter(documents: Document[]): Promise<Array<Document>> {
     const { checks, documentToObjectMap } = documents.reduce(
-      (accumulator, document: Document) => {
-        const permissionCheck = this.buildQuery(document);
-        accumulator.checks.push(permissionCheck);
-        accumulator.documentToObjectMap.set(document, permissionCheck.object);
-        return accumulator;
+      (acc, document: Document) => {
+        const check = this.buildQuery(document);
+        acc.checks.push(check);
+        acc.documentToObjectMap.set(document, check.object);
+        return acc;
       },
       {
-        checks: [] as ClientCheckRequest[],
+        checks: [] as ClientBatchCheckItem[],
         documentToObjectMap: new Map<Document, string>(),
       }
     );
