@@ -40,7 +40,7 @@ FGA_API_AUDIENCE=https://api.xxx.fga.dev/
 
 3. Running the example
    ```sh
-   npm run dev
+   npm start
    ```
 
 ## License

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
+import { Document } from "genkit/retriever";
+import { genkit } from "genkit";
 import { FGARetriever, auth0 } from "../src/retrievers/fga-retriever";
-import { Document, defineRetriever, retrieve } from "@genkit-ai/ai/retriever";
-import { configureGenkit } from "@genkit-ai/core";
 
 import { OpenFgaClient, CredentialsMethod } from "@openfga/sdk";
 
@@ -9,8 +9,7 @@ describe("FGARetriever", async () => {
   process.env.FGA_CLIENT_ID = "client-id";
   process.env.FGA_CLIENT_SECRET = "client-secret";
 
-  configureGenkit({
-    logLevel: "error",
+  const ai = genkit({
     plugins: [auth0()],
   });
 
@@ -19,7 +18,7 @@ describe("FGARetriever", async () => {
     Document.fromText("private content", { id: "private-doc" }),
   ];
 
-  const mockRetriever = defineRetriever(
+  const mockRetriever = ai.defineRetriever(
     { name: `auth0/test-retriever` },
     async () => ({ documents })
   );
@@ -50,13 +49,13 @@ describe("FGARetriever", async () => {
   };
 
   it("should create an instance of RetrieverAction with default OpenFgaClient", () => {
-    const retriever = FGARetriever.create(args);
+    const retriever = FGARetriever.create(ai, args);
     expect(retriever).toBeTypeOf("function");
     expect(retriever.__action.name).toBe("auth0/fga-retriever");
   });
 
   it("should create an instance of RetrieverAction with provided OpenFgaClient", () => {
-    const retriever = FGARetriever.create(args, mockClient);
+    const retriever = FGARetriever.create(ai, args, mockClient);
     expect(retriever).toBeTypeOf("function");
     expect(retriever.__action.name).toBe("auth0/fga-retriever");
   });
@@ -70,8 +69,8 @@ describe("FGARetriever", async () => {
       ],
     });
 
-    const documents = await retrieve({
-      retriever: FGARetriever.create(args, mockClient),
+    const documents = await ai.retrieve({
+      retriever: FGARetriever.create(ai, args, mockClient),
       query: "input",
     });
 

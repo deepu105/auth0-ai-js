@@ -11,15 +11,12 @@
   "license": "Apache-2.0",
   "scripts": {
     "generate": "npx tsx ./helpers/create-indexer.ts",
-    "dev": "npx tsx index.ts",
+    "start": "npx tsx index.ts",
     "fga:init": "npx tsx ./scripts/fga-init.ts"
   },
   "dependencies": {
-    "@auth0/ai-genkit": "*",
-    "@genkit-ai/ai": "^0.5.17",
-    "@genkit-ai/core": "^0.5.17",
+    "genkit": "^0.9.12",
     "@genkit-ai/dev-local-vectorstore": "^0.9.12",
-    "@genkit-ai/flow": "^0.5.17",
     "genkitx-openai": "^0.12.0",
     "dotenv": "^16.4.5",
     "@openfga/sdk": "^0.7.0"

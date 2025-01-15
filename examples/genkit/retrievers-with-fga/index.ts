@@ -5,15 +5,12 @@
  */
 import "dotenv/config";
 
-import * as z from "zod";
-
+import { z } from "genkit";
 import { FGARetriever } from "@auth0/ai-genkit";
-import { retrieve } from "@genkit-ai/ai";
-import { defineFlow, runFlow } from "@genkit-ai/flow";
 
 import { documentsRetriever, executeQuery, initializeGenkit } from "./helpers";
 
-initializeGenkit();
+const ai = initializeGenkit();
 
 /**
  * Demonstrates the usage of the Okta FGA (Fine-Grained Authorization)
@@ -41,29 +38,31 @@ async function main() {
   // UserID
   const user = "user1";
 
-  const demoFlow = defineFlow(
+  const retriever = FGARetriever.create(ai, {
+    retriever: documentsRetriever,
+    buildQuery: (doc) => ({
+      user: `user:${user}`,
+      object: `doc:${doc.metadata?.id}`,
+      relation: "viewer",
+    }),
+  });
+
+  const demoFlow = ai.defineFlow(
     { name: "demo", inputSchema: z.string(), outputSchema: z.string() },
     async (input: string) => {
-      const documents = await retrieve({
-        retriever: FGARetriever.create({
-          retriever: documentsRetriever,
-          buildQuery: (doc) => ({
-            user: `user:${user}`,
-            object: `doc:${doc.metadata?.id}`,
-            relation: "viewer",
-          }),
-        }),
+      const documents = await ai.retrieve({
+        retriever,
         query: input,
       });
 
-      return await executeQuery(input, documents);
+      return await executeQuery(ai, input, documents);
     }
   );
 
   /**
    * Output: `The provided context does not include any forecast...`
    */
-  console.log(await runFlow(demoFlow, "Show me forecast for ZEKO?"));
+  console.log(await demoFlow("Show me forecast for ZEKO?"));
 
   /**
    * If we add the following tuple to the Okta FGA:

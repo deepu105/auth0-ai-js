@@ -2,17 +2,15 @@ import "dotenv/config";
 
 import fs from "fs";
 import path from "path";
-import * as z from "zod";
 
-import { index } from "@genkit-ai/ai";
-import { Document } from "@genkit-ai/ai/retriever";
-import { defineFlow, runFlow } from "@genkit-ai/flow";
+import { z } from "genkit";
+import { Document } from "genkit/retriever";
 
 import { documentsIndexer, initializeGenkit } from "./";
 
-initializeGenkit();
+const ai = initializeGenkit();
 
-export const documentIndex = defineFlow(
+export const documentIndex = ai.defineFlow(
   {
     name: "documentIndex",
     inputSchema: z.string().describe("MD file path"),
@@ -32,7 +30,7 @@ export const documentIndex = defineFlow(
       documents.push(Document.fromText(txt, { file, id }));
     });
 
-    await index({
+    await ai.index({
       indexer: documentsIndexer,
       documents,
     });
@@ -40,5 +38,5 @@ export const documentIndex = defineFlow(
 );
 
 (async () => {
-  await runFlow(documentIndex, "./assets/docs");
+  await documentIndex("./assets/docs");
 })();
