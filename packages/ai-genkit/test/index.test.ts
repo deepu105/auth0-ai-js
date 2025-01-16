@@ -1,11 +1,10 @@
 import { describe, it, expect, vi } from "vitest";
-import { Document } from "genkit/retriever";
-import { genkit } from "genkit";
-import { FGARetriever, auth0 } from "../src/retrievers/fga-retriever";
+import { genkit, Document } from "genkit";
+import { FGAReranker, auth0 } from "../src/retrievers/fga-reranker";
 
 import { OpenFgaClient, CredentialsMethod } from "@openfga/sdk";
 
-describe("FGARetriever", async () => {
+describe("FGAReranker", async () => {
   process.env.FGA_CLIENT_ID = "client-id";
   process.env.FGA_CLIENT_SECRET = "client-secret";
 
@@ -17,11 +16,6 @@ describe("FGARetriever", async () => {
     Document.fromText("public content", { id: "public-doc" }),
     Document.fromText("private content", { id: "private-doc" }),
   ];
-
-  const mockRetriever = ai.defineRetriever(
-    { name: `auth0/test-retriever` },
-    async () => ({ documents })
-  );
 
   const mockBuildQuery = vi.fn((doc: Document) => ({
     object: `doc:${doc.metadata?.id}`,
@@ -45,20 +39,19 @@ describe("FGARetriever", async () => {
 
   const args = {
     ai,
-    retriever: mockRetriever,
     buildQuery: mockBuildQuery,
   };
 
-  it("should create an instance of RetrieverAction with default OpenFgaClient", () => {
-    const retriever = FGARetriever.create(args);
+  it("should create an instance of RerankerAction with default OpenFgaClient", () => {
+    const retriever = FGAReranker.create(args);
     expect(retriever).toBeTypeOf("function");
-    expect(retriever.__action.name).toBe("auth0/fga-retriever");
+    expect(retriever.__action.name).toBe("auth0/fga-reranker");
   });
 
-  it("should create an instance of RetrieverAction with provided OpenFgaClient", () => {
-    const retriever = FGARetriever.create(args, mockClient);
+  it("should create an instance of RerankerAction with provided OpenFgaClient", () => {
+    const retriever = FGAReranker.create(args, mockClient);
     expect(retriever).toBeTypeOf("function");
-    expect(retriever.__action.name).toBe("auth0/fga-retriever");
+    expect(retriever.__action.name).toBe("auth0/fga-reranker");
   });
 
   it("should filter relevant documents based on batchCheck results", async () => {
@@ -70,11 +63,13 @@ describe("FGARetriever", async () => {
       ],
     });
 
-    const documents = await ai.retrieve({
-      retriever: FGARetriever.create(args, mockClient),
+    const rankedDocuments = await ai.rerank({
+      reranker: FGAReranker.create(args, mockClient),
       query: "input",
+      documents,
     });
 
-    expect(documents).toEqual([documents[0]]);
+    expect(rankedDocuments[0].content).toEqual(documents[0].content);
+    expect(rankedDocuments[0].metadata.id).toEqual(documents[0].metadata?.id);
   });
 });
