@@ -1,27 +1,20 @@
 /**
- * GenKit Example: Retrievers with Okta FGA (Fine-Grained Authorization)
+ * GenKit Example: Rerankers with Okta FGA (Fine-Grained Authorization)
  *
  *
  */
 import "dotenv/config";
 
 import { z } from "genkit";
-import { FGARetriever } from "@auth0/ai-genkit";
+import { FGAReranker } from "./helpers/fga-reranker";
 
 import { documentsRetriever, executeQuery, initializeGenkit } from "./helpers";
-
-const ai = initializeGenkit();
 
 /**
  * Demonstrates the usage of the Okta FGA (Fine-Grained Authorization)
  * with a vector store index to query documents with permission checks.
  *
- * It performs the following steps:
- *    1. Defines a user ID.
- *    2. Retrive documents from a data source based on the user's permissions.
- *    3. Executes the user query and logs the response.
- *
- * The retrieveWithFGA checks if the user has the "viewer" relation to the document
+ * The FGAReranker checks if the user has the "viewer" relation to the document
  * based on predefined tuples in Okta FGA.
  *
  * Example:
@@ -32,15 +25,19 @@ const ai = initializeGenkit();
  */
 async function main() {
   console.log(
-    "\n..:: GenKit Example: Retrievers with Okta FGA (Fine-Grained Authorization)\n\n"
+    "\n..:: GenKit Example: Reranker with Okta FGA (Fine-Grained Authorization)\n\n"
   );
+
+  // initialize a GenKit instance
+  const ai = initializeGenkit();
 
   // UserID
   const user = "user1";
 
-  const retriever = FGARetriever.create({
+  // 1. Create an FGAReranker instance to check the permissions of the user.
+  const fgaReranker = FGAReranker.create({
     ai,
-    retriever: documentsRetriever,
+    // FGA tuple to query for the user's permissions
     buildQuery: (doc) => ({
       user: `user:${user}`,
       object: `doc:${doc.metadata?.id}`,
@@ -48,15 +45,23 @@ async function main() {
     }),
   });
 
+  // 2. Define a flow that retrieves and reranks documents.
   const demoFlow = ai.defineFlow(
     { name: "demo", inputSchema: z.string(), outputSchema: z.string() },
-    async (input: string) => {
+    async (query: string) => {
+      // 3. Retrieve documents from the in-memory vector store
       const documents = await ai.retrieve({
-        retriever,
-        query: input,
+        retriever: documentsRetriever,
+        query,
       });
-
-      return await executeQuery(ai, input, documents);
+      // 4. Rerank the documents based on the user's permissions
+      const rerankedDocuments = await ai.rerank({
+        reranker: fgaReranker,
+        query,
+        documents,
+      });
+      // 5. Execute the query with the reranked documents as context
+      return await executeQuery(ai, query, rerankedDocuments);
     }
   );
 
