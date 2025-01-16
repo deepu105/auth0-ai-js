@@ -15,6 +15,7 @@
     "fga:init": "npx tsx ./scripts/fga-init.ts"
   },
   "dependencies": {
+    "@auth0/ai-genkit": "*",
     "genkit": "^0.9.12",
     "@genkit-ai/dev-local-vectorstore": "^0.9.12",
     "genkitx-openai": "^0.12.0",

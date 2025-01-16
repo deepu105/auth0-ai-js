@@ -6,7 +6,8 @@
 import "dotenv/config";
 
 import { z } from "genkit";
-import { FGAReranker } from "./helpers/fga-reranker";
+
+import { FGAReranker } from "@auth0/ai-genkit";
 
 import { documentsRetriever, executeQuery, initializeGenkit } from "./helpers";
 

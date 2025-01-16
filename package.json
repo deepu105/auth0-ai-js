@@ -11,8 +11,6 @@
   "packageManager": "npm@9.8.0",
   "workspaces": [
     "packages/*",
-    "examples/llamaindex/retrievers-with-fga",
-    "examples/langchain/retrievers-with-fga",
-    "examples/genkit/retrievers-with-fga"
+    "examples/authorization-for-rag/*"
   ]
 }

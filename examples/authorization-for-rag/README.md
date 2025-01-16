@@ -19,12 +19,16 @@ Below is a high-level workflow:
 
 ### Examples
 
-Explore the following examples demonstrating the integration of **Okta FGA** with **LangChain** and **LlamaIndex** retrievers:
+Explore the following examples demonstrating the integration of **Okta FGA** with **LangChain**, **LlamaIndex**, and **Genkit**:
 
 - **LangChain with FGARetriever:**  
    An implementation showcasing how to wrap a LangChain retriever with FGARetriever to enforce authorization checks during document retrieval.  
-   [View Example](/examples/langchain/retrievers-with-fga/)
+   [View Example](/examples/authorization-for-rag/langchain/)
 
 - **LlamaIndex with FGARetriever:**  
    A sample application illustrating the use of FGARetriever with LlamaIndex to ensure users can only access permitted documents.  
-   [View Example](/examples/llamaindex/retrievers-with-fga/)
+   [View Example](/examples/authorization-for-rag/llamaindex/)
+
+- **Genkit with FGAReranker:**  
+   A sample application demonstrating the use of FGAReranker with Genkit, emphasizing re-ranking of results to prioritize authorized content for users.
+  [View Example](/examples/authorization-for-rag/genkit/)
