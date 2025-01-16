@@ -1,12 +1,13 @@
-import openAI, { gpt4oMini, textEmbedding3Small } from "genkitx-openai";
-import { auth0 } from "./fga-reranker";
 import { Genkit, genkit } from "genkit";
+import { logger } from "genkit/logging";
 import { Document } from "genkit/retriever";
+import openAI, { gpt4oMini, textEmbedding3Small } from "genkitx-openai";
+
+import { auth0 } from "@auth0/ai-genkit";
 import devLocalVectorstore, {
   devLocalIndexerRef,
   devLocalRetrieverRef,
 } from "@genkit-ai/dev-local-vectorstore";
-import { logger } from "genkit/logging";
 
 export const indexName = "documents";
 
