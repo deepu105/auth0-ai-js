@@ -1,9 +1,4 @@
-import { z, Genkit } from "genkit";
-import {
-  CommonRetrieverOptionsSchema,
-  Document,
-  RetrieverArgument,
-} from "genkit/retriever";
+import { z, Genkit, Document } from "genkit";
 import { GenkitPlugin, genkitPlugin } from "genkit/plugin";
 
 import {
@@ -13,38 +8,32 @@ import {
   OpenFgaClient,
 } from "@openfga/sdk";
 
-export type FGARetrieverCheckerFn = (doc: Document) => ClientBatchCheckItem;
+export type FGARerankerCheckerFn = (doc: Document) => ClientBatchCheckItem;
 
-export type FGARetrieverConstructorArgs = {
-  buildQuery: FGARetrieverCheckerFn;
+export type FGARerankerConstructorArgs = {
+  buildQuery: FGARerankerCheckerFn;
 };
 
-export type FGARetrieverArgs<
-  CustomOptions extends z.ZodTypeAny = z.ZodTypeAny
-> = FGARetrieverConstructorArgs & {
+export type FGARerankerArgs = FGARerankerConstructorArgs & {
   ai: Genkit;
-  retriever: RetrieverArgument<CustomOptions>;
-  preRerankKMax?: number;
 };
 
 /**
- * A retriever that allows filtering documents based on access control checks
- * using OpenFGA. This class wraps an underlying retriever and performs batch
- * checks on retrieved documents, returning only the ones that pass the
- * specified access criteria.
+ * A Reranker that allows filtering documents based on access control checks
+ * using OpenFGA. This class performs batch checks on retrieved documents, returning only the ones that pass the
+ * specified access criteria. ALl filtered docs have maximum score of 1.
  *
  *
  * @remarks
- * The FGARetriever requires a buildQuery function to specify how access checks
+ * The FGAReranker requires a buildQuery function to specify how access checks
  * are formed for each document, the checks are executed via an OpenFGA client
  * or equivalent mechanism. The checks are then mapped back to their corresponding
  * documents to filter out those for which access is denied.
  *
  * @example
  * ```ts
- * const retriever = FGARetriever.create({
+ * const reranker = FGAReranker.create({
  *   ai,
- *   retriever: someOtherRetriever,
  *   buildQuery: (doc) => ({
  *     user: `user:${user}`,
  *     object: `doc:${doc.metadata.id}`,
@@ -53,17 +42,17 @@ export type FGARetrieverArgs<
  * });
  * ```
  */
-export class FGARetriever {
-  lc_namespace = ["genkit", "retrievers", "fga-retriever"];
-  private buildQuery: FGARetrieverCheckerFn;
+export class FGAReranker {
+  lc_namespace = ["genkit", "rerankers", "fga-reranker"];
+  private buildQuery: FGARerankerCheckerFn;
   private fgaClient: OpenFgaClient;
 
   static lc_name() {
-    return "FGARetriever";
+    return "FGAReranker";
   }
 
   private constructor(
-    { buildQuery }: FGARetrieverConstructorArgs,
+    { buildQuery }: FGARerankerConstructorArgs,
     fgaClient?: OpenFgaClient
   ) {
     this.buildQuery = buildQuery;
@@ -86,50 +75,51 @@ export class FGARetriever {
   }
 
   /**
-   * Creates a new FGARetriever instance using the given arguments and optional OpenFgaClient.
+   * Creates a new FGAReranker instance using the given arguments and optional OpenFgaClient.
    *
-   * @param args - @FGARetrieverArgs
+   * @param args - @FGARerankerArgs
    * @param args.ai - A Genkit Instance.
-   * @param args.retriever - The underlying retriever instance to fetch documents.
    * @param args.buildQuery - A function to generate access check requests for each document.
-   * @param args.preRerankKMax - Optional - max value for Genkit preRerankK.
    * @param fgaClient - Optional - OpenFgaClient instance to execute checks against.
-   * @returns A Retriever instance instance configured with the provided arguments.
+   * @returns A Reranker instance instance configured with the provided arguments.
    */
-  static create<CustomOptions extends z.ZodTypeAny = z.ZodTypeAny>(
-    {
-      ai,
-      buildQuery,
-      retriever,
-      preRerankKMax,
-    }: FGARetrieverArgs<CustomOptions>,
+  static create(
+    { ai, buildQuery }: FGARerankerArgs,
     fgaClient?: OpenFgaClient
   ) {
-    const client = new FGARetriever({ buildQuery }, fgaClient);
+    const client = new FGAReranker({ buildQuery }, fgaClient);
 
-    const fgaRetrieverOptionsSchema = CommonRetrieverOptionsSchema.extend({
-      preRerankK: z.number().max(preRerankKMax || 1000),
-    });
-
-    const fgaRetriever = ai.defineRetriever(
+    const fgaReranker = ai.defineReranker(
       {
-        name: `auth0/fga-retriever`,
-        configSchema: fgaRetrieverOptionsSchema,
+        name: `auth0/fga-reranker`,
+        configSchema: z.object({
+          k: z.number().optional(),
+        }),
       },
-      async (input, options) => {
-        const documents = await ai.retrieve({
-          retriever,
-          query: input,
-          options,
-        });
-
+      async (_query, documents, options) => {
         const filteredDocuments = await client.filter(documents);
+        const rankedDocuments = filteredDocuments
+          // add score to filtered documents
+          .map((doc) => {
+            const score = 1; // give maximum score to filtered docs
+            return {
+              ...doc,
+              metadata: { ...doc.metadata, score },
+            };
+          })
+          .slice(
+            0,
+            // if `k` is not provided, return all filtered documents
+            options && options.k ? options.k : undefined
+          );
 
-        return { documents: filteredDocuments };
+        return {
+          documents: rankedDocuments,
+        };
       }
     );
 
-    return fgaRetriever;
+    return fgaReranker;
   }
 
   /**
