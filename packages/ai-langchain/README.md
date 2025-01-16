@@ -1,10 +1,25 @@
 # Auth0 AI for LangChain
 
-This package integrates [LangChain](https://js.langchain.com/docs/tutorials/) with [Auth0 AI](https://www.auth0.ai/) for enhanced document retrieval capabilities.
+`@auth0/ai-langchain` is an SDK for building secure AI-powered applications using [Auth0](https://www.auth0.ai/), [Okta FGA](https://docs.fga.dev/) and [LangChain](https://js.langchain.com/docs/tutorials/).
+
+This SDK provides Okta FGA as a [retriever](https://js.langchain.com/docs/concepts/retrievers/) for RAG applications. The retriever allows filtering documents based on access control checks defined in Okta FGA. This retriever performs batch checks on retrieved documents, returning only the ones that pass the specified access criteria.
+
+## Install
+
+> [!WARNING] > `@auth0/ai-langchain` is currently under development and not yet published to npm.
+
+```
+$ npm install @auth0/ai-langchain
+```
 
 ## Usage
 
+Example [RAG Application](../../examples/langchain/retrievers-with-fga).
+
+Create a Retriever instance using the `FGAReranker.create` method.
+
 ```typescript
+// From examples/langchain/retrievers-with-fga
 import { FGARetriever } from "@auth0/ai-langchain";
 import { MemoryStore, RetrievalChain } from "./helpers/memory-store";
 import { readDocuments } from "./helpers/read-documents";
@@ -50,4 +65,4 @@ main().catch(console.error);
 </p>
 <p align="center">Auth0 is an easy to implement, adaptable authentication and authorization platform. To learn more checkout <a href="https://auth0.com/why-auth0">Why Auth0?</a></p>
 <p align="center">
-This project is licensed under the MIT license. See the <a href="/LICENSE"> LICENSE</a> file for more info.</p>
+This project is licensed under the Apache 2.0 license. See the <a href="/LICENSE"> LICENSE</a> file for more info.</p>
