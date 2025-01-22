@@ -9,6 +9,8 @@ import {
 
 import type { BaseRetrieverInput } from "@langchain/core/retrievers";
 import type { CallbackManagerForRetrieverRun } from "@langchain/core/callbacks/manager";
+import { StructuredToolInterface, tool } from "@langchain/core/tools";
+import { z } from "zod";
 
 export type FGARetrieverCheckerFn = (
   doc: DocumentInterface<Record<string, any>>
@@ -157,6 +159,24 @@ export class FGARetriever extends BaseRetriever {
 
     return documents.filter(
       (d, i) => resultsByObject.get(documentToObject.get(d) || "") === true
+    );
+  }
+
+  /**
+   * Converts the FGA retriever into a tool that can be used by a LangGraph agent.
+   * @returns StructuredToolInterface.
+   */
+  asJoinedStringTool(): StructuredToolInterface {
+    return tool(
+      async ({ query }) => {
+        const documents = await this.retriever.invoke(query);
+        return documents.map((doc) => doc.pageContent).join("\n\n");
+      },
+      {
+        name: "fga-retriever-tool",
+        description: "Returns the filtered documents page content as string.",
+        schema: z.object({ query: z.string() }),
+      }
     );
   }
 }
