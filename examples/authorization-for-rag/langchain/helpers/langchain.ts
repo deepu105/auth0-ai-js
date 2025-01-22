@@ -1,12 +1,12 @@
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { createRetrievalChain } from "langchain/chains/retrieval";
-import { MemoryVectorStore } from "langchain/vectorstores/memory";
 
-import { Document, DocumentInterface } from "@langchain/core/documents";
+import { DocumentInterface } from "@langchain/core/documents";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { BaseRetrieverInterface } from "@langchain/core/retrievers";
 import { Runnable, RunnableInterface } from "@langchain/core/runnables";
-import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
+import { ChatOpenAI } from "@langchain/openai";
+import { LanguageModelLike } from "@langchain/core/language_models/base";
 
 /**
  * Represents a chain that uses a retriever to gather relevant documents
@@ -36,7 +36,10 @@ export class RetrievalChain {
       `Answer the user's question: {input} based on the following context {context}. Only use the information provided in the context. If you need more information, ask for it.`
     );
     const combineDocsChain = await createStuffDocumentsChain({
-      llm: new ChatOpenAI({ temperature: 0, modelName: "gpt-4o-mini" }),
+      llm: new ChatOpenAI({
+        temperature: 0,
+        model: "gpt-4o-mini",
+      }) as unknown as LanguageModelLike,
       prompt,
     });
     const retrievalChain = await createRetrievalChain({
@@ -48,39 +51,11 @@ export class RetrievalChain {
   }
 
   // Query the retrieval chain with a user question
-  async query({ query }: { query: string }) {
-    const response = await this.engine.invoke({
+  async query(query: string) {
+    const { answer } = await this.engine.invoke({
       input: query,
     });
 
-    return response;
-  }
-}
-
-/**
- * Represents an in-memory store for the vector embeddings of the documents.
- *
- * @remarks
- * This store is used to create a vector store retriever for the retrieval chain.
- */
-export class MemoryStore {
-  private store: MemoryVectorStore;
-
-  private constructor(store: MemoryVectorStore) {
-    this.store = store;
-  }
-
-  static async fromDocuments(documents: Document<Record<string, any>>[]) {
-    const embeddings = new OpenAIEmbeddings();
-    const vectorStore = await MemoryVectorStore.fromDocuments(
-      documents,
-      embeddings
-    );
-
-    return new MemoryStore(vectorStore);
-  }
-
-  asRetriever() {
-    return this.store.asRetriever();
+    return answer;
   }
 }
