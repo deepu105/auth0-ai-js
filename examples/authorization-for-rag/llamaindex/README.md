@@ -21,7 +21,7 @@ This example demonstrates how to combine [LlamaIndex](https://ts.llamaindex.ai/)
     FGA_STORE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
     FGA_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
     FGA_CLIENT_SECRET=xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxx
-    # Optional
+    # Required only for non-US regions
     FGA_API_URL=https://api.xxx.fga.dev
     FGA_API_AUDIENCE=https://api.xxx.fga.dev/
    ```
