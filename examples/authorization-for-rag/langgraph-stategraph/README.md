@@ -22,7 +22,7 @@ This example demonstrates how to combine [LangChain](https://js.langchain.com/) 
     FGA_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
     FGA_CLIENT_SECRET=xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxx
     # Optional
-    FGA_API_URL=api.xxx.fga.dev
+    FGA_API_URL=https://api.xxx.fga.dev
     FGA_API_AUDIENCE=https://api.xxx.fga.dev/
    ```
 
