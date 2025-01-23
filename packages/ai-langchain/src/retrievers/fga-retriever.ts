@@ -167,9 +167,10 @@ export class FGARetriever extends BaseRetriever {
    * @returns StructuredToolInterface.
    */
   asJoinedStringTool(): StructuredToolInterface {
+    const retriever = this;
     return tool(
       async ({ query }) => {
-        const documents = await this.retriever.invoke(query);
+        const documents = await retriever.invoke(query);
         return documents.map((doc) => doc.pageContent).join("\n\n");
       },
       {
