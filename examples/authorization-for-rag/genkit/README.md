@@ -18,9 +18,8 @@ OPENAI_API_KEY=xx-xxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxx
 FGA_STORE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
 FGA_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx
 FGA_CLIENT_SECRET=xxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxx
-# Optional
+# Required only for non-US regions
 FGA_API_URL=https://api.xxx.fga.dev
-FGA_API_TOKEN_ISSUER=auth.fga.dev
 FGA_API_AUDIENCE=https://api.xxx.fga.dev/
 ```
 

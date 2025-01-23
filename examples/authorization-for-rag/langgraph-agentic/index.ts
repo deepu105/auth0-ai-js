@@ -1,13 +1,14 @@
 /**
- * LangChain Example: Retrievers with Okta FGA (Fine-Grained Authorization)
+ * LangChain + LangGraph Agents Example: Agentic Retrieval with Okta FGA (Fine-Grained Authorization)
  */
 import "dotenv/config";
+
+import { OpenAIEmbeddings } from "@langchain/openai";
+import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { FGARetriever } from "@auth0/ai-langchain";
 
-import { RetrievalChain } from "./helpers/langchain";
 import { readDocuments } from "./helpers/read-documents";
-import { MemoryVectorStore } from "langchain/vectorstores/memory";
-import { OpenAIEmbeddings } from "@langchain/openai";
+import { RetrievalAgent } from "./helpers/langchain";
 
 /**
  * Demonstrates the usage of the Okta FGA (Fine-Grained Authorization)
@@ -24,7 +25,7 @@ import { OpenAIEmbeddings } from "@langchain/openai";
  */
 async function main() {
   console.info(
-    "\n..:: Langchain Example: Retrievers with Okta FGA (Fine-Grained Authorization)\n\n"
+    "\n..:: LangChain + LangGraph Agents Example: Agentic Retrieval with Okta FGA (Fine-Grained Authorization)\n\n"
   );
 
   // UserID
@@ -36,21 +37,23 @@ async function main() {
     documents,
     new OpenAIEmbeddings({ model: "text-embedding-3-small" })
   );
-  // 3. Create a retrieval chain with root prompt and OpenAI model configuration
-  const retrievalChain = await RetrievalChain.create({
-    // 4. Chain the retriever with the FGARetriever to check the permissions.
-    retriever: FGARetriever.create({
-      retriever: vectorStore.asRetriever(),
-      // FGA tuple to query for the user's permissions
-      buildQuery: (doc) => ({
-        user: `user:${user}`,
-        object: `doc:${doc.metadata.id}`,
-        relation: "viewer",
-      }),
+  // 3. Create a retriever that uses FGA to gate fetching documents on permissions.
+  const retriever = FGARetriever.create({
+    retriever: vectorStore.asRetriever(),
+    // FGA tuple to query for the user's permissions
+    buildQuery: (doc) => ({
+      user: `user:${user}`,
+      object: `doc:${doc.metadata.id}`,
+      relation: "viewer",
     }),
   });
-  // 5. Query the retrieval chain with a prompt
-  const answer = await retrievalChain.query("Show me forecast for ZEKO?");
+  // 4. Convert the retriever into a tool for an agent.
+  const fgaTool = retriever.asJoinedStringTool();
+  // 5. The agent will call the tool, rephrasing the original question and
+  // populating the "query" argument, until it can answer the user's question.
+  const retrievalAgent = RetrievalAgent.create([fgaTool]);
+  // 6. Query the retrieval agent with a prompt
+  const answer = await retrievalAgent.query("Show me forecast for ZEKO?");
 
   /**
    * Output: `The provided context does not include specific financial forecasts...`
