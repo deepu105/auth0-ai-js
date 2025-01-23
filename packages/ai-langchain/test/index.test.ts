@@ -41,6 +41,10 @@ describe("FGARetriever", () => {
       metadata: { id: "private-doc" },
       pageContent: "private content",
     }),
+    new Document({
+      metadata: { id: "private-doc-2" },
+      pageContent: "private content 2",
+    }),
   ];
 
   const args = {
@@ -70,7 +74,25 @@ describe("FGARetriever", () => {
       ],
     });
 
-    const result = await retriever._getRelevantDocuments("query");
+    const result = await retriever.invoke("query");
     expect(result).toEqual([mockDocuments[0]]);
+  });
+
+  it("should return joined string of filtered doc content", async () => {
+    const retriever = FGARetriever.create(args, mockClient);
+    // @ts-ignore
+    mockRetriever._getRelevantDocuments.mockResolvedValue(mockDocuments);
+    // @ts-ignore
+    mockClient.batchCheck = vi.fn().mockResolvedValue({
+      result: [
+        { request: { object: "doc:public-doc" }, allowed: true },
+        { request: { object: "doc:private-doc" }, allowed: false },
+        { request: { object: "doc:private-doc-2" }, allowed: true },
+      ],
+    });
+
+    const tool = retriever.asJoinedStringTool();
+    const result = await tool.invoke({ query: "test query" });
+    expect(result).toEqual("public content\n\nprivate content 2");
   });
 });
